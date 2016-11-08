@@ -1,6 +1,6 @@
 package com.project;
 
-class Shot{
+public class Shot{
 	private double yMean;
 	private double ampMean;
 	private long startingByte;
@@ -13,7 +13,6 @@ class Shot{
 		this.startingByte = startingByte;
 		this.lengthOfShot = lengthOfShot;
 	}
-
 
 	public double getyMean() {
 		return yMean;
