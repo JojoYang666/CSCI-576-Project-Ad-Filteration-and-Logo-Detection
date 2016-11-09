@@ -15,28 +15,34 @@ public class MyProgram{
 	public static void main(String[] args){
 		parseArgs(args);
 		FrameReader fReader = new FrameReader(inputVideoFile, width, height);
+		makeShots(fReader);
+		makeScenes();
+		fReader.close();
+	}
+	
+	private static void makeShots(FrameReader fReader){
 		long maxNumOfFrames = fReader.getNumberOfFrames();
 		int offset = 0;
 		int numOfFrames = 0;
 		double yFrameAvg = 0;
-		boolean newShot = true;
+		boolean newShot = true;					
 		
-		while(offset<maxNumOfFrames){
-			
+		while(offset<maxNumOfFrames){	
 			if(newShot==false){
 				yMatrix = fReader.read(offset);
-				for(int y = 0;y<width;y+=10){
-					for(int x = 0; x<height; x+=10){
-						yFrameAvg += yMatrix[y][x]; 
-					}
-				}
+				yFrameAvg = getFrameAvg();
 				numOfFrames++;
 				yFrameAvg /= ((width/10)*(height/10));
 				
-				if(Math.abs(yFrameAvg - currentYMean)>(0.1*currentYMean)){
+				if(Math.abs(yFrameAvg - (currentYMean/numOfFrames))>(0.1*currentYMean/numOfFrames)){
 					//Exceeded threshold
 					newShot = true;
 					shots.get(shots.size()-1).setLengthOfShot((offset*fReader.getLen() - 1) - shots.get(shots.size()-1).getStartingByte());
+					shots.get(shots.size()-1).setyMean(currentYMean/(numOfFrames-1));
+				}
+				else{
+					currentYMean += yFrameAvg;
+					offset+=5;
 				}
 			}
 			
@@ -44,11 +50,7 @@ public class MyProgram{
 				shots.add(new Shot());
 				shots.get(shots.size()-1).setStartingByte(offset*fReader.getLen());
 				yMatrix = fReader.read(offset);
-				for(int y = 0;y<width;y+=10){
-					for(int x = 0; x<height; x+=10){
-						yFrameAvg += yMatrix[y][x]; 
-					}
-				}
+				yFrameAvg = getFrameAvg();
 				numOfFrames++;
 				yFrameAvg /= ((width/10)*(height/10));
 				currentYMean += yFrameAvg;
@@ -56,7 +58,20 @@ public class MyProgram{
 				newShot = false;
 			}
 		}
+	}
+	
+	private static void makeScenes(){
 		
+	}
+	
+	private static double getFrameAvg(){
+		double frameAvg = 0;
+		for(int y = 0;y<width;y+=10){
+			for(int x = 0; x<height; x+=10){
+				frameAvg += yMatrix[y][x]; 
+			}
+		}
+		return frameAvg;
 	}
 	
 	private static void parseArgs(String[] args){
