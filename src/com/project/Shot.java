@@ -13,7 +13,11 @@ public class Shot{
 		this.startingByte = startingByte;
 		this.lengthOfShot = lengthOfShot;
 	}
-
+	
+	public Shot(){
+		
+	}
+	
 	public double getyMean() {
 		return yMean;
 	}

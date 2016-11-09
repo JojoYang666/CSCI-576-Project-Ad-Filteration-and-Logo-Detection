@@ -70,8 +70,55 @@ public class FrameReader {
 		}
 	}
 	
-	public static long getFileLength(){
+	public long getFileLength(){
 		return fileLength;
 	}
 
+	public static InputStream getInputFileStream() {
+		return inputFileStream;
+	}
+
+	public static void setInputFileStream(InputStream inputFileStream) {
+		FrameReader.inputFileStream = inputFileStream;
+	}
+
+	public static int getWidth() {
+		return width;
+	}
+
+	public static void setWidth(int width) {
+		FrameReader.width = width;
+	}
+
+	public static int getHeight() {
+		return height;
+	}
+
+	public static void setHeight(int height) {
+		FrameReader.height = height;
+	}
+
+	public static int getLen() {
+		return len;
+	}
+
+	public static void setLen(int len) {
+		FrameReader.len = len;
+	}
+
+	public static double[][] getyMatrix() {
+		return yMatrix;
+	}
+
+	public static void setyMatrix(double[][] yMatrix) {
+		FrameReader.yMatrix = yMatrix;
+	}
+
+	public static void setFileLength(long fileLength) {
+		FrameReader.fileLength = fileLength;
+	}
+
+	public int getNumberOfFrames(){
+		return (int)(fileLength/len);
+	}
 }
