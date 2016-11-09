@@ -21,7 +21,11 @@ public class FrameReader {
 		this.yMatrix = new double[width][height];
 		open(fileName);
 	}
-	
+	/**
+	 * Reading the RGB value of a one frame and returns Y values 
+	 * @param offset frame location where Y value is going to be calculated. 
+	 * @return double 2D matrix that is Y value of one frame
+	 */
 	public double[][] read(long offset){
 
 		try {
@@ -50,7 +54,10 @@ public class FrameReader {
 		
 		return yMatrix;
 	}
-	
+	/**
+	 * Open file 
+	 * @param fileName File name 
+	 */
 	public static void open(String fileName){
 		try {
 			File file = new File(fileName);
@@ -60,7 +67,9 @@ public class FrameReader {
 			Utilities.die("File not found - " + fileName);
 		}
 	}
-	
+	/**
+	 * close the input file stream. 
+	 */
 	public static void close(){
 		try {
 			inputFileStream.close();

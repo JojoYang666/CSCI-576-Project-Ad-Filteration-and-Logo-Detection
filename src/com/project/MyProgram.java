@@ -19,7 +19,10 @@ public class MyProgram{
 		makeScenes();
 		fReader.close();
 	}
-	
+	/**
+	 * Making Shot object using the frames from Frame Reader
+	 * @param fReader
+	 */
 	private static void makeShots(FrameReader fReader){
 		long maxNumOfFrames = fReader.getNumberOfFrames();
 		int offset = 0;
