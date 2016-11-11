@@ -13,13 +13,15 @@ public class FrameReader {
 	private static RandomAccessFile randFile;
 	private static long fileLength;
 	private static int width, height, len;
-	private static double[][] yMatrix;
+	//private static double[][] yMatrix;
+    private static YUV yuv;
 	
 	public FrameReader(String fileName, int width, int height){
 		this.width = width;
 		this.height = height;
 		this.len = width*height*3;
-		this.yMatrix = new double[width][height];
+		//this.yMatrix = new double[width][height];
+        this.yuv = null;
 		open(fileName);
 	}
 	/**
@@ -27,9 +29,13 @@ public class FrameReader {
 	 * @param offset frame location where Y value is going to be calculated. 
 	 * @return double 2D matrix that is Y value of one frame
 	 */
-	public double[][] read(long offset){
+	public YUV read(long offset){
 
-		try {
+		double[][] yMatrix = new double[width][height];
+        double[][] uMatrix = new double[width][height];  // Pb here
+        double[][] vMatrix = new double[width][height];  // Pr here
+      
+        try {
 			byte[] bytes = new byte[len];
 			/*bufferedInputFileStream.skip(offset*len);
 			bufferedInputFileStream.read(bytes, 0, len);
@@ -48,7 +54,9 @@ public class FrameReader {
 					byte g = bytes[ind+height*width];
 					byte b = bytes[ind+height*width*2]; 
 					ind++;
-					yMatrix[x][y] = (0.299*(int)(r+128) + 0.587*(int)(g+128) + 0.114*(int)(b+128));
+					yMatrix[x][y] = trimY((0.299*(int)(r+128) + 0.587*(int)(g+128) + 0.114*(int)(b+128)));
+                    uMatrix[x][y] = trimUV((-0.169*(int)(r+128) + -0.331*(int)(g+128) + 0.5*(int)(b+128)));
+                    vMatrix[x][y] = trimUV((0.5*(int)(r+128) + -0.419*(int)(g+128) + -0.081*(int)(b+128)));
 					//System.out.println(yMatrix[x][y]);
 				}
 			}
@@ -60,7 +68,8 @@ public class FrameReader {
 			e.printStackTrace();
 		}
 		
-		return yMatrix;
+		this.yuv = new YUV(yMatrix, uMatrix, vMatrix);
+        return(this.yuv);
 	}
 	/**
 	 * Open file 
@@ -124,14 +133,10 @@ public class FrameReader {
 	public static void setLen(int len) {
 		FrameReader.len = len;
 	}
-
-	public static double[][] getyMatrix() {
-		return yMatrix;
-	}
-
-	public static void setyMatrix(double[][] yMatrix) {
-		FrameReader.yMatrix = yMatrix;
-	}
+  
+    public static YUV getYUV() {
+        return yuv;
+    }
 
 	public static void setFileLength(long fileLength) {
 		FrameReader.fileLength = fileLength;
@@ -140,4 +145,18 @@ public class FrameReader {
 	public int getNumberOfFrames(){
 		return (int)(fileLength/len);
 	}
+  
+    private static double trimUV(double num)
+    {
+        if (num < -127.5) return(-127.5);
+        if (num > 127.5) return(127.5);
+        return(num);
+    }
+
+    private static double trimY(double num)
+    {
+        if (num < 0) return(0);
+        if (num > 255) return(255);
+        return(num);
+    }
 }

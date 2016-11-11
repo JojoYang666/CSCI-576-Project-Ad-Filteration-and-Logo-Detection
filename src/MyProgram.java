@@ -20,6 +20,7 @@ public class MyProgram{
 	private static double currentShotLumTotal;
 	private static double[][] currentYMatrix = new double[width][height];
 	private static double[][] prevYMatrix = new double[width][height];
+    private static YUV currentYUV;
 
 	
 	public static void main(String[] args){
@@ -55,7 +56,8 @@ public class MyProgram{
 		while(offset<maxNumOfFrames){
 			//System.out.println("CURRENT FRAME - " + offset);
 			if(newShot==false){
-				currentYMatrix = fReader.read(offset);
+                currentYUV = fReader.read(offset);
+				currentYMatrix = currentYUV.getY();
 				yFrameAvg = getFrameAvg();
 				numOfFrames++;
 				interFrameDiffEstimate = getFrameDifference(currentYMatrix, prevYMatrix);
@@ -88,7 +90,8 @@ public class MyProgram{
 			if(newShot==true){
 				shots.add(new Shot());
 				shots.get(shots.size()-1).setStartingByte(offset*fReader.getLen());
-				currentYMatrix = fReader.read(offset);
+				currentYUV = fReader.read(offset);
+				currentYMatrix = currentYUV.getY();
 				yFrameAvg = getFrameAvg();
 				numOfFrames++;
 				currentShotLumTotal += yFrameAvg;
