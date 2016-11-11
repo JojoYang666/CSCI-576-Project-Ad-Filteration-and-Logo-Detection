@@ -30,7 +30,8 @@ public class FrameReader {
 
 		try {
 			byte[] bytes = new byte[len];
-			inputFileStream.read(bytes, (int)offset*len, len);
+			inputFileStream.skip(offset*len);
+			inputFileStream.read(bytes, 0, len);
 
 			int ind = 0;
 			for(int y = 0; y < height; y++){

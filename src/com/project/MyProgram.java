@@ -1,5 +1,13 @@
 package com.project;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class MyProgram{
@@ -16,7 +24,8 @@ public class MyProgram{
 		parseArgs(args);
 		FrameReader fReader = new FrameReader(inputVideoFile, width, height);
 		makeShots(fReader);
-		makeScenes();
+		writeToDisk();
+		//makeScenes();
 		fReader.close();
 	}
 	/**
@@ -30,6 +39,7 @@ public class MyProgram{
 		double yFrameAvg = 0;
 		boolean newShot = true;					
 		
+		//TODO Audio processing
 		while(offset<maxNumOfFrames){	
 			if(newShot==false){
 				yMatrix = fReader.read(offset);
@@ -45,7 +55,7 @@ public class MyProgram{
 				}
 				else{
 					currentYMean += yFrameAvg;
-					offset+=5;
+					offset+=6;
 				}
 			}
 			
@@ -57,8 +67,38 @@ public class MyProgram{
 				numOfFrames++;
 				yFrameAvg /= ((width/10)*(height/10));
 				currentYMean += yFrameAvg;
-				offset+=5;
+				offset+=6;
 				newShot = false;
+			}
+		}
+	}
+	
+	private static void writeToDisk(){
+		String fileName = "output";
+		int fileNo = 1;
+		String extension = ".rgb";
+		InputStream inputFileStream = null;
+
+		try {
+			File file = new File(inputVideoFile);
+			inputFileStream = new FileInputStream(file);
+		} catch (FileNotFoundException e) {
+			Utilities.die("File not found - " + inputVideoFile);
+		}
+		
+		for(Shot s: shots){
+			try  
+			{
+				FileOutputStream fw = new FileOutputStream(new File(fileName + fileNo + extension));
+			    byte[] bytes = new byte[(int) s.getLengthOfShot()];
+			    inputFileStream.read(bytes, 0, (int) s.getLengthOfShot());
+			    fw.write(bytes);
+			    fw.close();   
+			    fileNo++;
+			}
+			catch (IOException e)
+			{
+			    System.err.println("Error: " + e.getMessage());
 			}
 		}
 	}
@@ -78,14 +118,14 @@ public class MyProgram{
 	}
 	
 	private static void parseArgs(String[] args){
-		if(args.length!=4){
+		if(args.length!=1){
 			Utilities.die("Not enough arguments! \nUsage java MyProgram input.rgb input.wav output.rgb output.wav");		
 		}
 		
 		inputVideoFile = args[0];
-		inputAudioFile = args[1];
-		outputVideoFile = args[2];
-		outputAudioFile = args[3];
+		//inputAudioFile = args[1];
+		//outputVideoFile = args[2];
+		//outputAudioFile = args[3];
 	}
 	
 }
