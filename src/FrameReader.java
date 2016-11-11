@@ -1,15 +1,16 @@
 
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 
 
 public class FrameReader {
 
 	private static InputStream inputFileStream;
+	//private static BufferedInputStream bufferedInputFileStream;
+	private static RandomAccessFile randFile;
 	private static long fileLength;
 	private static int width, height, len;
 	private static double[][] yMatrix;
@@ -30,8 +31,13 @@ public class FrameReader {
 
 		try {
 			byte[] bytes = new byte[len];
-			inputFileStream.skip(offset*len);
-			inputFileStream.read(bytes, 0, len);
+			/*bufferedInputFileStream.skip(offset*len);
+			bufferedInputFileStream.read(bytes, 0, len);
+			bufferedInputFileStream.reset();*/
+			
+			randFile.skipBytes((int) (offset*len));
+			randFile.read(bytes, 0, len);
+			randFile.seek(0);
 
 			int ind = 0;
 			for(int y = 0; y < height; y++){
@@ -43,7 +49,7 @@ public class FrameReader {
 					byte b = bytes[ind+height*width*2]; 
 					ind++;
 					yMatrix[x][y] = (0.299*(int)(r+128) + 0.587*(int)(g+128) + 0.114*(int)(b+128));
-					System.out.println(yMatrix[x][y]);
+					//System.out.println(yMatrix[x][y]);
 				}
 			}
 
@@ -62,10 +68,12 @@ public class FrameReader {
 	 */
 	public static void open(String fileName){
 		try {
-			File file = new File(fileName);
+			/*File file = new File(fileName);
 			inputFileStream = new FileInputStream(file);
-			fileLength = file.length();
-		} catch (FileNotFoundException e) {
+			bufferedInputFileStream = new BufferedInputStream(inputFileStream);*/
+			randFile = new RandomAccessFile(fileName, "r");
+			fileLength = randFile.length();
+		} catch (IOException e) {
 			Utilities.die("File not found - " + fileName);
 		}
 	}
@@ -74,7 +82,7 @@ public class FrameReader {
 	 */
 	public static void close(){
 		try {
-			inputFileStream.close();
+			randFile.close();
 		} catch (IOException e) {
 			Utilities.die("IO Exception - RGB File");
 			e.printStackTrace();

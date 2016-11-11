@@ -17,18 +17,24 @@ public class MyProgram{
 	private static final int width = 480, height = 270;
 	private ArrayList<Scene> scenes;
 	private static String inputVideoFile, inputAudioFile, outputVideoFile, outputAudioFile;
-	private static double currentYMean;
-	private static double[][] yMatrix = new double[width][height];
+	private static double currentShotLumTotal;
+	private static double[][] currentYMatrix = new double[width][height];
+	private static double[][] prevYMatrix = new double[width][height];
+
 	
 	public static void main(String[] args){
 		parseArgs(args);
 		FrameReader fReader = new FrameReader(inputVideoFile, width, height);
 		makeShots(fReader);
-		//System.out.println("SIZE OF SHOTS - " + shots.size());
+		System.out.println("SIZE OF FILE - " + fReader.getFileLength());
+		System.out.println("SIZE OF SHOTS - " + shots.size());
+		for(Shot s: shots){
+			System.out.println("SHOT: " + s.getStartingByte() + "   " + s.getLengthOfShot());
+		}
 		//for(Shot s: shots){
 		//	System.out.println(s.getStartingByte() + " " + s.getLengthOfShot());
 		//}
-		//writeToDisk();
+		writeToDisk();
 		//makeScenes();
 		fReader.close();
 	}
@@ -38,44 +44,68 @@ public class MyProgram{
 	 */
 	private static void makeShots(FrameReader fReader){
 		long maxNumOfFrames = fReader.getNumberOfFrames();
-		int offset = 0;
-		int numOfFrames = 0;
-		double yFrameAvg = 0;
-		boolean newShot = true;					
+		int offset = 0, numOfFrames = 0;
+		double yFrameAvg = 0, interFrameDiffEstimate = 0, shotBasedDiffEstimate = 0;
+		boolean newShot = true, firstFrameDiffEstimate = true;					
 		shots = new ArrayList<Shot>();
 		
+		System.out.println("MAX NUMBER OF FRAMES - " + maxNumOfFrames);
+
 		//TODO Audio processing
-		while(offset<maxNumOfFrames){	
+		while(offset<maxNumOfFrames){
+			//System.out.println("CURRENT FRAME - " + offset);
 			if(newShot==false){
-				yMatrix = fReader.read(offset);
+				currentYMatrix = fReader.read(offset);
 				yFrameAvg = getFrameAvg();
 				numOfFrames++;
-				yFrameAvg /= ((width/10)*(height/10));
+				interFrameDiffEstimate = getFrameDifference(currentYMatrix, prevYMatrix);
 				
-				if(Math.abs(yFrameAvg - (currentYMean/numOfFrames))>(0.4*currentYMean/numOfFrames)){
-					//Exceeded threshold
-					newShot = true;
-					shots.get(shots.size()-1).setLengthOfShot((offset*fReader.getLen()) - shots.get(shots.size()-1).getStartingByte());
-					shots.get(shots.size()-1).setyMean(currentYMean/(numOfFrames-1));
-					currentYMean = 0;
+				if(firstFrameDiffEstimate==false){
+					if(Math.abs(interFrameDiffEstimate - (shotBasedDiffEstimate/(numOfFrames-2)))>(0.5*shotBasedDiffEstimate/(numOfFrames-2))){
+						//Exceeded threshold
+						newShot = true;
+						firstFrameDiffEstimate = true;
+						shots.get(shots.size()-1).setLengthOfShot((offset*fReader.getLen()) - shots.get(shots.size()-1).getStartingByte());
+						shots.get(shots.size()-1).setyMean(currentShotLumTotal/(numOfFrames-1));
+						currentShotLumTotal = 0;
+						shotBasedDiffEstimate = 0;
+						numOfFrames = 0;
+						//System.out.println(shots.get(shots.size()-1).getyMean());
+					}
+					else{
+						currentShotLumTotal += yFrameAvg;
+						offset+=6;
+					}
 				}
-				else{
-					currentYMean += yFrameAvg;
-					offset+=6;
+				else if(firstFrameDiffEstimate==true){
+					currentShotLumTotal += yFrameAvg;
+					offset += 6;
+					firstFrameDiffEstimate = false;
 				}
+				shotBasedDiffEstimate += interFrameDiffEstimate;
 			}
 			
 			if(newShot==true){
 				shots.add(new Shot());
 				shots.get(shots.size()-1).setStartingByte(offset*fReader.getLen());
-				yMatrix = fReader.read(offset);
+				currentYMatrix = fReader.read(offset);
 				yFrameAvg = getFrameAvg();
 				numOfFrames++;
-				yFrameAvg /= ((width/10)*(height/10));
-				currentYMean += yFrameAvg;
+				currentShotLumTotal += yFrameAvg;
 				offset+=6;
 				newShot = false;
 			}
+
+			for(int x = 0; x<width; x+=2){
+				for(int y = 0; y<height; y++){
+					prevYMatrix[x][y] = currentYMatrix[x][y];
+				}
+			}
+		}
+
+		if(numOfFrames!=0){
+			shots.get(shots.size()-1).setLengthOfShot(fReader.getFileLength() - shots.get(shots.size()-1).getStartingByte());
+			shots.get(shots.size()-1).setyMean(currentShotLumTotal/(numOfFrames-1));
 		}
 	}
 	
@@ -115,12 +145,22 @@ public class MyProgram{
 	
 	private static double getFrameAvg(){
 		double frameAvg = 0;
-		for(int y = 0;y<width;y+=10){
-			for(int x = 0; x<height; x+=10){
-				frameAvg += yMatrix[y][x]; 
+		for(int y = 0;y<width;y++){
+			for(int x = 0; x<height; x++){
+				frameAvg += currentYMatrix[y][x]; 
 			}
 		}
-		return frameAvg;
+		return frameAvg/(width*height);
+	}
+
+	private static double getFrameDifference(double[][] currentFrameLum, double[][] prevFrameLum){
+		double frameDiff = 0;
+		for(int x = 0; x<width; x++){
+			for(int y = 0; y<height; y++){
+				frameDiff += (currentFrameLum[x][y] - prevFrameLum[x][y]);
+			}
+		}
+		return frameDiff/(width*height);
 	}
 	
 	private static void parseArgs(String[] args){
