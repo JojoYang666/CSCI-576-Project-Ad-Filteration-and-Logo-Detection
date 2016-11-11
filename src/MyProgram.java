@@ -110,6 +110,7 @@ public class MyProgram{
 	}
 	
 	private static void writeToDisk(){
+        final int MAX_LIMIT = 999999999;
 		String fileName = "output";
 		int fileNo = 1;
 		String extension = ".rgb";
@@ -126,9 +127,19 @@ public class MyProgram{
 			try  
 			{
 				FileOutputStream fw = new FileOutputStream(new File(fileName + fileNo + extension));
-			    byte[] bytes = new byte[(int) s.getLengthOfShot()];
-			    inputFileStream.read(bytes, 0, (int) s.getLengthOfShot());
-			    fw.write(bytes);
+                long bytesRemaining = s.getLengthOfShot();
+                byte[] bytes;
+                while (bytesRemaining != 0){
+                    if (bytesRemaining >= MAX_LIMIT){
+                        bytes = new byte[MAX_LIMIT];
+                    }
+                    else{
+                        bytes = new byte[(int)bytesRemaining];
+                    }
+                    inputFileStream.read(bytes);
+                    fw.write(bytes);
+                    bytesRemaining -= bytes.length;
+                }
 			    fw.close();   
 			    fileNo++;
 			}
