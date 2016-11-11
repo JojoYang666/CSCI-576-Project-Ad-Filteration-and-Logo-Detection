@@ -1,4 +1,4 @@
-package com.project;
+
 
 public class Shot{
 	private double yMean;

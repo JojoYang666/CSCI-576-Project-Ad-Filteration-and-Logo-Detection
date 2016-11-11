@@ -1,4 +1,4 @@
-package com.project;
+
 
 public class Scene{
 	private long startingByte;
