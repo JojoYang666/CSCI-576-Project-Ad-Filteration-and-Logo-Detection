@@ -14,7 +14,7 @@ public class MyProgram{
 	private static ArrayList<Shot> shots;
 	private double globalYMean;
 	private double globalMseAmp;
-	private static final int width = 470, height = 280;
+	private static final int width = 480, height = 270;
 	private ArrayList<Scene> scenes;
 	private static String inputVideoFile, inputAudioFile, outputVideoFile, outputAudioFile;
 	private static double currentYMean;
@@ -24,7 +24,11 @@ public class MyProgram{
 		parseArgs(args);
 		FrameReader fReader = new FrameReader(inputVideoFile, width, height);
 		makeShots(fReader);
-		writeToDisk();
+		//System.out.println("SIZE OF SHOTS - " + shots.size());
+		//for(Shot s: shots){
+		//	System.out.println(s.getStartingByte() + " " + s.getLengthOfShot());
+		//}
+		//writeToDisk();
 		//makeScenes();
 		fReader.close();
 	}
@@ -38,6 +42,7 @@ public class MyProgram{
 		int numOfFrames = 0;
 		double yFrameAvg = 0;
 		boolean newShot = true;					
+		shots = new ArrayList<Shot>();
 		
 		//TODO Audio processing
 		while(offset<maxNumOfFrames){	
@@ -47,11 +52,12 @@ public class MyProgram{
 				numOfFrames++;
 				yFrameAvg /= ((width/10)*(height/10));
 				
-				if(Math.abs(yFrameAvg - (currentYMean/numOfFrames))>(0.1*currentYMean/numOfFrames)){
+				if(Math.abs(yFrameAvg - (currentYMean/numOfFrames))>(0.4*currentYMean/numOfFrames)){
 					//Exceeded threshold
 					newShot = true;
-					shots.get(shots.size()-1).setLengthOfShot((offset*fReader.getLen() - 1) - shots.get(shots.size()-1).getStartingByte());
+					shots.get(shots.size()-1).setLengthOfShot((offset*fReader.getLen()) - shots.get(shots.size()-1).getStartingByte());
 					shots.get(shots.size()-1).setyMean(currentYMean/(numOfFrames-1));
+					currentYMean = 0;
 				}
 				else{
 					currentYMean += yFrameAvg;

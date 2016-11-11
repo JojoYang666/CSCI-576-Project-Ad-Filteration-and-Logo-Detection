@@ -42,7 +42,8 @@ public class FrameReader {
 					byte g = bytes[ind+height*width];
 					byte b = bytes[ind+height*width*2]; 
 					ind++;
-					yMatrix[y][x] = (0.299*(int)r + 0.587*(int)g + 0.114*(int)b);
+					yMatrix[x][y] = (0.299*(int)(r+128) + 0.587*(int)(g+128) + 0.114*(int)(b+128));
+					System.out.println(yMatrix[x][y]);
 				}
 			}
 
