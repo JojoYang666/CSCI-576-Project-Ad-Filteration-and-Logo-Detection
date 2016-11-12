@@ -20,7 +20,11 @@ public class MyProgram{
 	private static double currentShotLumTotal;
 	private static double[][] currentYMatrix = new double[width][height];
 	private static double[][] prevYMatrix = new double[width][height];
-    private static YUV currentYUV;
+	private static double[][] currentUMatrix = new double[width][height];
+	private static double[][] prevUMatrix = new double[width][height];
+	private static double[][] currentVMatrix = new double[width][height];
+	private static double[][] prevVMatrix = new double[width][height];
+	private static YUV currentYUV;
 
 	
 	public static void main(String[] args){
@@ -46,7 +50,9 @@ public class MyProgram{
 	private static void makeShots(FrameReader fReader){
 		long maxNumOfFrames = fReader.getNumberOfFrames();
 		int offset = 0, numOfFrames = 0;
-		double yFrameAvg = 0, interFrameDiffEstimate = 0, shotBasedDiffEstimate = 0;
+		double yFrameAvg = 0;
+		double interFrameDiffEstimateY = 0, interFrameDiffEstimateU = 0, interFrameDiffEstimateV = 0;
+		double shotBasedDiffEstimateY = 0, shotBasedDiffEstimateU = 0, shotBasedDiffEstimateV = 0;
 		boolean newShot = true, firstFrameDiffEstimate = true;					
 		shots = new ArrayList<Shot>();
 		
@@ -58,33 +64,41 @@ public class MyProgram{
 			if(newShot==false){
                 currentYUV = fReader.read(offset);
 				currentYMatrix = currentYUV.getY();
+				currentUMatrix = currentYUV.getU();
+				currentVMatrix = currentYUV.getV();
 				yFrameAvg = getFrameAvg();
 				numOfFrames++;
-				interFrameDiffEstimate = getFrameDifference(currentYMatrix, prevYMatrix);
+				interFrameDiffEstimateY = getFrameDifference(currentYMatrix, prevYMatrix);
+				interFrameDiffEstimateU = getFrameDifference(currentUMatrix, prevUMatrix);
+				interFrameDiffEstimateV = getFrameDifference(currentVMatrix, prevVMatrix);
 				
 				if(firstFrameDiffEstimate==false){
-					if(Math.abs(interFrameDiffEstimate - (shotBasedDiffEstimate/(numOfFrames-2)))>(0.5*shotBasedDiffEstimate/(numOfFrames-2))){
+					if(((interFrameDiffEstimateY*0.1 + interFrameDiffEstimateU*0.45 + interFrameDiffEstimateV*0.45) - (shotBasedDiffEstimateY/(numOfFrames-2)*0.1 + shotBasedDiffEstimateU/(numOfFrames-2)*0.45 + shotBasedDiffEstimateV/(numOfFrames-2)*0.45))>(0.2*(shotBasedDiffEstimateY/(numOfFrames-2)*0.1 + shotBasedDiffEstimateU/(numOfFrames-2)*0.45 + shotBasedDiffEstimateV/(numOfFrames-2)*0.45))){
 						//Exceeded threshold
 						newShot = true;
 						firstFrameDiffEstimate = true;
 						shots.get(shots.size()-1).setLengthOfShot((offset*fReader.getLen()) - shots.get(shots.size()-1).getStartingByte());
 						shots.get(shots.size()-1).setyMean(currentShotLumTotal/(numOfFrames-1));
 						currentShotLumTotal = 0;
-						shotBasedDiffEstimate = 0;
+						shotBasedDiffEstimateY = 0;
+						shotBasedDiffEstimateU = 0;
+						shotBasedDiffEstimateV = 0;
 						numOfFrames = 0;
 						//System.out.println(shots.get(shots.size()-1).getyMean());
 					}
 					else{
 						currentShotLumTotal += yFrameAvg;
-						offset+=6;
+						offset+=1;
 					}
 				}
 				else if(firstFrameDiffEstimate==true){
 					currentShotLumTotal += yFrameAvg;
-					offset += 6;
+					offset += 1;
 					firstFrameDiffEstimate = false;
 				}
-				shotBasedDiffEstimate += interFrameDiffEstimate;
+				shotBasedDiffEstimateY += interFrameDiffEstimateY;
+				shotBasedDiffEstimateU += interFrameDiffEstimateU;
+				shotBasedDiffEstimateV += interFrameDiffEstimateV;
 			}
 			
 			if(newShot==true){
@@ -92,16 +106,20 @@ public class MyProgram{
 				shots.get(shots.size()-1).setStartingByte(offset*fReader.getLen());
 				currentYUV = fReader.read(offset);
 				currentYMatrix = currentYUV.getY();
+				currentUMatrix = currentYUV.getU();
+				currentVMatrix = currentYUV.getV();
 				yFrameAvg = getFrameAvg();
 				numOfFrames++;
-				currentShotLumTotal += yFrameAvg;
-				offset+=6;
+				currentShotLumTotal = yFrameAvg;
+				offset+=1;
 				newShot = false;
 			}
 
-			for(int x = 0; x<width; x+=2){
+			for(int x = 0; x<width; x++){
 				for(int y = 0; y<height; y++){
 					prevYMatrix[x][y] = currentYMatrix[x][y];
+					prevUMatrix[x][y] = currentUMatrix[x][y];
+					prevVMatrix[x][y] = currentVMatrix[x][y];
 				}
 			}
 		}
@@ -171,7 +189,7 @@ public class MyProgram{
 		double frameDiff = 0;
 		for(int x = 0; x<width; x++){
 			for(int y = 0; y<height; y++){
-				frameDiff += (currentFrameLum[x][y] - prevFrameLum[x][y]);
+				frameDiff += Math.pow(currentFrameLum[x][y] - prevFrameLum[x][y],2);
 			}
 		}
 		return frameDiff/(width*height);
