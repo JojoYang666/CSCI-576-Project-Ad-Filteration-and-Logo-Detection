@@ -1,3 +1,5 @@
+package player;
+
 import javax.swing.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
