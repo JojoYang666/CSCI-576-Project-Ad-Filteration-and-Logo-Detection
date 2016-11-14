@@ -34,11 +34,8 @@ public class WaveFile {
 	        }
 
 	        ais = AudioSystem.getAudioInputStream(file);
-
-	        af = ais.getFormat();
-
 	        framesCount = ais.getFrameLength();
-	        
+	        af = ais.getFormat();
 
 	        sampleRate = (int) af.getSampleRate();
 	        
@@ -49,34 +46,20 @@ public class WaveFile {
 
 	        long dataLength = framesCount * af.getSampleSizeInBits() * af.getChannels() / 8;
 	        
-	        System.out.println("sampleRate:"+sampleRate+" sampleSize: "+sampleSize+" channelsNum"+channelsNum);
+	        System.out.println("sampleRate:"+sampleRate+" sampleSize: "+sampleSize);
+	     
 	        data = new byte[(int) dataLength];
+	        System.out.println("dataLength:"+dataLength+ " data list length:"+data.length);
 	        ais.read(data);
 
-	        AudioInputStream aisForPlay = AudioSystem.getAudioInputStream(file);
-	        try {
-	            clip = AudioSystem.getClip();
-	            clip.open(aisForPlay);
-	            clip.setFramePosition(0);
-	           
-	            canPlay = true;
-	        } catch (LineUnavailableException e) {
-	            canPlay = false;
-	            System.out.println("I can play only 8bit and 16bit music.");
-	        }
+	        
 	    }
 
 	    public boolean isCanPlay() {
 	        return canPlay;
 	    }
 
-	    public void play() {
-	        clip.start();
-	    }
-
-	    public void stop() {
-	        clip.stop();
-	    }
+	  
 
 	    public AudioFormat getAudioFormat() {
 	        return af;
@@ -96,10 +79,7 @@ public class WaveFile {
 
 
 	    /**
-	     * Returns sample (amplitude value). Note that in case of stereo samples
-	     * go one after another. I.e. 0 - first sample of left channel, 1 - first
-	     * sample of the right channel, 2 - second sample of the left channel, 3 -
-	     * second sample of the rigth channel, etc.
+	     * Returns amplitude value
 	     */
 	    public int getSampleInt(int sampleNumber) {
 
