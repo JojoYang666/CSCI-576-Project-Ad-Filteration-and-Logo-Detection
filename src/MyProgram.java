@@ -49,7 +49,7 @@ public class MyProgram{
 	 */
 	private static void makeShots(FrameReader fReader){
 		long maxNumOfFrames = fReader.getNumberOfFrames();
-		int offset = 0, numOfFrames = 0;
+		long offset = 0, numOfFrames = 0;
 		double yFrameAvg = 0;
 		double interFrameDiffEstimateY = 0, interFrameDiffEstimateU = 0, interFrameDiffEstimateV = 0;
 		double shotBasedDiffEstimateY = 0, shotBasedDiffEstimateU = 0, shotBasedDiffEstimateV = 0;
@@ -62,7 +62,7 @@ public class MyProgram{
 		while(offset<maxNumOfFrames){
 			//System.out.println("CURRENT FRAME - " + offset);
 			if(newShot==false){
-                currentYUV = fReader.read(offset);
+                currentYUV = fReader.read();
 				currentYMatrix = currentYUV.getY();
 				currentUMatrix = currentYUV.getU();
 				currentVMatrix = currentYUV.getV();
@@ -104,7 +104,7 @@ public class MyProgram{
 			if(newShot==true){
 				shots.add(new Shot());
 				shots.get(shots.size()-1).setStartingByte(offset*fReader.getLen());
-				currentYUV = fReader.read(offset);
+				currentYUV = fReader.read();
 				currentYMatrix = currentYUV.getY();
 				currentUMatrix = currentYUV.getU();
 				currentVMatrix = currentYUV.getV();

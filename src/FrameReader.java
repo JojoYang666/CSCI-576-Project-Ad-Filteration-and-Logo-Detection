@@ -29,7 +29,7 @@ public class FrameReader {
 	 * @param offset frame location where Y value is going to be calculated. 
 	 * @return double 2D matrix that is Y value of one frame
 	 */
-	public YUV read(long offset){
+	public YUV read(){
 
 		double[][] yMatrix = new double[width][height];
         double[][] uMatrix = new double[width][height];  // Pb here
@@ -41,9 +41,9 @@ public class FrameReader {
 			bufferedInputFileStream.read(bytes, 0, len);
 			bufferedInputFileStream.reset();*/
 			
-			randFile.skipBytes((int) (offset*len));
+			//randFile.skipBytes((int) (offset*len));
 			randFile.read(bytes, 0, len);
-			randFile.seek(0);
+			//randFile.seek(0);
 
 			int ind = 0;
 			for(int y = 0; y < height; y++){
