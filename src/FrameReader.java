@@ -1,5 +1,6 @@
 
 
+import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,7 +10,7 @@ import java.io.RandomAccessFile;
 public class FrameReader {
 
 	private static InputStream inputFileStream;
-	//private static BufferedInputStream bufferedInputFileStream;
+	private static BufferedInputStream bufferedInputFileStream;
 	private static RandomAccessFile randFile;
 	private static long fileLength;
 	private static int width, height, len;
@@ -37,13 +38,13 @@ public class FrameReader {
       
         try {
 			byte[] bytes = new byte[len];
-			/*bufferedInputFileStream.skip(offset*len);
-			bufferedInputFileStream.read(bytes, 0, len);
-			bufferedInputFileStream.reset();*/
+//			bufferedInputFileStream.skip(offset*len);
+//			bufferedInputFileStream.read(bytes, 0, len);
+//			bufferedInputFileStream.reset();
 			
-			//randFile.skipBytes((int) (offset*len));
+//			randFile.skipBytes((int) (offset*len));
 			randFile.read(bytes, 0, len);
-			//randFile.seek(0);
+//			randFile.seek(0);
 
 			int ind = 0;
 			for(int y = 0; y < height; y++){

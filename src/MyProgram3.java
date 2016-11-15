@@ -1,20 +1,21 @@
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-public class MyProgram2 {
+public class MyProgram3 {
 	private static ArrayList<Shot> shots;
 	private double globalYMean;
 	private double globalMseAmp;
 	private static final int width = 480, height = 270;
 	private ArrayList<Scene> scenes;
+	private static ArrayList<Double> valsY = new ArrayList<Double>();
+	private static ArrayList<Double> valsU = new ArrayList<Double>();
+	private static ArrayList<Double> valsV = new ArrayList<Double>();
 	private static String inputVideoFile, inputAudioFile, outputVideoFile, outputAudioFile;
 	private static double currentShotLumTotal;
 	private static double[][] currentYMatrix = new double[width][height];
@@ -30,10 +31,10 @@ public class MyProgram2 {
 		FrameReader fReader = new FrameReader(inputVideoFile, width, height);
 		makeShots(fReader);
 		System.out.println("SIZE OF FILE - " + fReader.getFileLength());
-		System.out.println("SIZE OF SHOTS - " + shots.size());
-		for (Shot s : shots) {
-			System.out.println("SHOT: " + s.getStartingByte() + "   " + s.getLengthOfShot());
-		}
+//		System.out.println("SIZE OF SHOTS - " + shots.size());
+//		for (Shot s : shots) {
+//			System.out.println("SHOT: " + s.getStartingByte() + "   " + s.getLengthOfShot());
+//		}
 		// for(Shot s: shots){
 		// System.out.println(s.getStartingByte() + " " + s.getLengthOfShot());
 		// }
@@ -50,10 +51,10 @@ public class MyProgram2 {
 	private static void makeShots(FrameReader fReader) {
 		long maxNumOfFrames = fReader.getNumberOfFrames();
 		int offset = 0, numOfFrames = 0;
-		double yFrameAvg = 0;
 		double interFrameDiffEstimateY = 0, interFrameDiffEstimateU = 0, interFrameDiffEstimateV = 0;
-		double shotBasedDiffEstimateY = 0, shotBasedDiffEstimateU = 0, shotBasedDiffEstimateV = 0;
-		double allChannelInterFrameDiffEstimate = 0, allChannelShotBasedDiffEstimate = 0;
+//		double shotBasedDiffEstimateY = 0, shotBasedDiffEstimateU = 0, shotBasedDiffEstimateV = 0;
+		double yThreshold = 0, uThreshold = 0, vThreshold = 0;
+		int oldIndex = 0, sizeOfSlidingWindow = 5, votes = 0;
 		boolean newShot = true, firstFrameDiffEstimate = true;
 		shots = new ArrayList<Shot>();
 
@@ -67,75 +68,109 @@ public class MyProgram2 {
 				currentYMatrix = currentYUV.getY();
 				currentUMatrix = currentYUV.getU();
 				currentVMatrix = currentYUV.getV();
-				yFrameAvg = 0;
-				yFrameAvg = getFrameAvg();
-				numOfFrames++;
 				interFrameDiffEstimateY = blockMatchingAlgo(currentYMatrix, prevYMatrix);
 				interFrameDiffEstimateU = blockMatchingAlgo(currentUMatrix, prevUMatrix);
 				interFrameDiffEstimateV = blockMatchingAlgo(currentVMatrix, prevVMatrix);
-				//allChannelInterFrameDiffEstimate = 0.3*interFrameDiffEstimateY + 0.35*interFrameDiffEstimateU + 0.35*interFrameDiffEstimateV;
+//				if(firstFrameDiffEstimate==true){
+//					valsY.add((double) interFrameDiffEstimateY);
+//					valsU.add((double) interFrameDiffEstimateU);
+//					valsV.add((double) interFrameDiffEstimateV);
+//					firstFrameDiffEstimate = false;
+//				}
+//				else{
+//					if(interFrameDiffEstimateY>valsY.get(valsY.size()-1))
+//						valsY.add(interFrameDiffEstimateY);
+//					if(interFrameDiffEstimateU>valsU.get(valsU.size()-1))
+//						valsU.add(interFrameDiffEstimateU);
+//					if(interFrameDiffEstimateV>valsV.get(valsV.size()-1))
+//						valsV.add(interFrameDiffEstimateV);
+//				}
+				if(valsY.size()==sizeOfSlidingWindow)
+					valsY.remove(0);
+				if(valsU.size()==sizeOfSlidingWindow)
+					valsU.remove(0);
+				if(valsV.size()==sizeOfSlidingWindow)
+					valsV.remove(0);				
 				
-				//System.out.println("TOTAL DIFFERENCE ESTIMATE: " + allChannelInterFrameDiffEstimate);
-				if (firstFrameDiffEstimate == false) {
-					if (((interFrameDiffEstimateY>shotBasedDiffEstimateY)&&(Math.abs(interFrameDiffEstimateY - shotBasedDiffEstimateY) > (2*shotBasedDiffEstimateY)))|((interFrameDiffEstimateU>shotBasedDiffEstimateU)&&(Math.abs(interFrameDiffEstimateU - shotBasedDiffEstimateU) > (2*shotBasedDiffEstimateU)))|((interFrameDiffEstimateV>shotBasedDiffEstimateV)&&(Math.abs(interFrameDiffEstimateV - shotBasedDiffEstimateV) > (2*shotBasedDiffEstimateV)))) {
-						// Exceeded threshold
-						newShot = true;
-						firstFrameDiffEstimate = true;
-						shots.get(shots.size() - 1).setLengthOfShot(
-								(offset * fReader.getLen()) - shots.get(shots.size() - 1).getStartingByte());
-						shots.get(shots.size() - 1).setyMean(currentShotLumTotal / (numOfFrames - 1));
-						System.out.println("LENGTH OF SHOT IN FRAMES - " + (shots.get(shots.size()-1).getLengthOfShot())/388800);
-						currentShotLumTotal = 0;
-						shotBasedDiffEstimateY = 0;
-						shotBasedDiffEstimateU = 0;
-						shotBasedDiffEstimateV = 0;
-						numOfFrames = 0;
-						// System.out.println(shots.get(shots.size()-1).getyMean());
-					} else {
-						currentShotLumTotal += yFrameAvg;
-						offset += 1;
-					}
-				} else if (firstFrameDiffEstimate == true) {
-					currentShotLumTotal += yFrameAvg;
-					offset += 1;
+				if(firstFrameDiffEstimate==true)
 					firstFrameDiffEstimate = false;
+				else{
+					votes = 0;
+					if(interFrameDiffEstimateY>yThreshold)
+						votes++;
+					if(interFrameDiffEstimateU>uThreshold)
+						votes++;
+					if(interFrameDiffEstimateV>vThreshold)
+						votes++;
+					if(votes>=2){
+						System.out.println("THAT'S A SHOT, BOYS!");
+//						shots.get(shots.size() - 1).setLengthOfShot((offset * fReader.getLen()) - shots.get(shots.size() - 1).getStartingByte());
+						newShot = true;
+					}
 				}
-				shotBasedDiffEstimateY = interFrameDiffEstimateY;
-				shotBasedDiffEstimateU = interFrameDiffEstimateU;
-				shotBasedDiffEstimateV = interFrameDiffEstimateV;
+				
+				valsY.add((double) interFrameDiffEstimateY);
+				valsU.add((double) interFrameDiffEstimateU);
+				valsV.add((double) interFrameDiffEstimateV);
+				yThreshold = 2*calcThreshold(valsY);
+				uThreshold = 2*calcThreshold(valsU);
+				vThreshold = 2*calcThreshold(valsV);
+				
+				System.out.println("Y CHANNEL - " + interFrameDiffEstimateY);
+				System.out.println("U CHANNEL - " + interFrameDiffEstimateU);
+				System.out.println("V CHANNEL - " + interFrameDiffEstimateV);
+				System.out.println("Y THRESHOLD IS " + yThreshold);
+				System.out.println("U THRESHOLD IS " + uThreshold);
+				System.out.println("V THRESHOLD IS " + vThreshold);
+				offset += 1;
 			}
 
 			if (newShot == true) {
-				shots.add(new Shot());
-				shots.get(shots.size() - 1).setStartingByte(offset * fReader.getLen());
+//				shots.add(new Shot());
+//				shots.get(shots.size() - 1).setStartingByte(offset * fReader.getLen());
 				currentYUV = fReader.read();
 				currentYMatrix = currentYUV.getY();
-				// currentUMatrix = currentYUV.getU();
-				// currentVMatrix = currentYUV.getV();
-				yFrameAvg = 0;
-				yFrameAvg = getFrameAvg();
-				numOfFrames++;
-				currentShotLumTotal = yFrameAvg;
+				currentUMatrix = currentYUV.getU();
+				currentVMatrix = currentYUV.getV();
+//				numOfFrames++;
+				valsY.clear();
+				valsU.clear();
+				valsV.clear();
 				offset += 1;
+				firstFrameDiffEstimate = true;
 				newShot = false;
 			}
 
 			for (int x = 0; x < width; x++) {
 				for (int y = 0; y < height; y++) {
 					prevYMatrix[x][y] = currentYMatrix[x][y];
-					// prevUMatrix[x][y] = currentUMatrix[x][y];
-					// prevVMatrix[x][y] = currentVMatrix[x][y];
+					prevUMatrix[x][y] = currentUMatrix[x][y];
+					prevVMatrix[x][y] = currentVMatrix[x][y];
 				}
 			}
 		}
 
-		if (numOfFrames != 0) {
-			shots.get(shots.size() - 1)
-					.setLengthOfShot(fReader.getFileLength() - shots.get(shots.size() - 1).getStartingByte());
-			shots.get(shots.size() - 1).setyMean(currentShotLumTotal / (numOfFrames - 1));
-		}
+//		if (numOfFrames != 0) {
+//			shots.get(shots.size() - 1)
+//					.setLengthOfShot(fReader.getFileLength() - shots.get(shots.size() - 1).getStartingByte());
+//			shots.get(shots.size() - 1).setyMean(currentShotLumTotal / (numOfFrames - 1));
+//		}
 	}
 
+	private static double calcThreshold(ArrayList<Double> vals){
+		double avg = 0, sumOfDiff = 0;
+		for(int i = 0; i<vals.size();i++){
+			avg += vals.get(i);
+		}
+		avg /= vals.size();
+		
+		for(int i = 0; i<vals.size(); i++){
+			sumOfDiff += Math.abs(vals.get(i) - avg);
+		}
+		sumOfDiff /= vals.size();
+		return (avg + sumOfDiff);
+	}
+	
 	private static void writeToDisk() {
 		final int MAX_LIMIT = 999999999;
 		String fileName = "output";
@@ -238,7 +273,7 @@ public class MyProgram2 {
 				//System.out.println("INTER-FRAME DIFF: " + frameDiff);
 			}
 		}
-		System.out.println("$$TOTAL INTER-FRAME DIFF: " + frameDiff);
+//		System.out.println("$$TOTAL INTER-FRAME DIFF: " + frameDiff);
 		return frameDiff;
 	}
 
