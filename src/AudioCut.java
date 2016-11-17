@@ -68,120 +68,99 @@ public class AudioCut
     shot.setStartingByte(933120000);
     shot.setLengthOfShot(13608000);
     shots.add(shot);
-    
     shot = new Shot();
     shot.setStartingByte(946728000);
     shot.setLengthOfShot(20995200);
     shots.add(shot);
-    
     shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
+    shot.setStartingByte(967723200);
+    shot.setLengthOfShot(10108800);
+    shots.add(shot);
+    shot = new Shot();
+    shot.setStartingByte(977832000);
+    shot.setLengthOfShot(31492800);
+    shots.add(shot);
+    shot = new Shot();
+    shot.setStartingByte(1009324800);
+    shot.setLengthOfShot(24494400);
+    shots.add(shot);
+    shot = new Shot();
+    shot.setStartingByte(1033819200);
+    shot.setLengthOfShot(13996800);
+    shots.add(shot);
+    shot = new Shot();
+    shot.setStartingByte(1047816000);
+    shot.setLengthOfShot(20606400);
     shots.add(shot);
     
     shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
+    shot.setStartingByte(1068422400);
+    shot.setLengthOfShot(21384000);
+    shots.add(shot);
+    shot = new Shot();
+    shot.setStartingByte(1089806400);
+    shot.setLengthOfShot(13608000);
+    shots.add(shot);
+    shot = new Shot();
+    shot.setStartingByte(1103414400);
+    shot.setLengthOfShot(4665600);
+    shots.add(shot);
+    shot = new Shot();
+    shot.setStartingByte(1108080000);
+    shot.setLengthOfShot(303264000);
+    shots.add(shot);
+    shot = new Shot();
+    shot.setStartingByte(1411344000);
+    shot.setLengthOfShot(279936000);
+    shots.add(shot);
+    shot = new Shot();
+    shot.setStartingByte(1691280000);
+    shot.setLengthOfShot(466560000);
+    shots.add(shot);
+    shot = new Shot();
+    shot.setStartingByte(2157840000);
+    shot.setLengthOfShot(12441600);
+    shots.add(shot);
+    shot = new Shot();
+    shot.setStartingByte(2170281600);
+    shot.setLengthOfShot(11664000);
+    shots.add(shot);
+    shot = new Shot();
+    shot.setStartingByte(2181945600);
+    shot.setLengthOfShot(33825600);
+    shots.add(shot);
+    shot = new Shot();
+    shot.setStartingByte(2215771200);
+    shot.setLengthOfShot(20995200);
     shots.add(shot);
     
     shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
+    shot.setStartingByte(2236766400);
+    shot.setLengthOfShot(36158400);
     shots.add(shot);
-    
     shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
+    shot.setStartingByte(2272924800);
+    shot.setLengthOfShot(30715200);
     shots.add(shot);
-    
     shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
+    shot.setStartingByte(2303640000);
+    shot.setLengthOfShot(24105600);
     shots.add(shot);
-    
     shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
+    shot.setStartingByte(2327745600);
+    shot.setLengthOfShot(5054400);
     shots.add(shot);
-    
     shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
+    shot.setStartingByte(2332800000);
+    shot.setLengthOfShot(174960000);
     shots.add(shot);
-    
     shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
+    shot.setStartingByte(2507760000);
+    shot.setLengthOfShot(291600000);
     shots.add(shot);
-    
     shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
-    shots.add(shot);
-    
-    shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
-    shots.add(shot);
-    
-    shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
-    shots.add(shot);
-    
-    shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
-    shots.add(shot);
-    
-    shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
-    shots.add(shot);
-    
-    shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
-    shots.add(shot);
-    
-    shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
-    shots.add(shot);
-    
-    shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
-    shots.add(shot);
-    
-    shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
-    shots.add(shot);
-    
-    shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
-    shots.add(shot);
-    
-    shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
-    shots.add(shot);
-    
-    shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
-    shots.add(shot);
-    
-    shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
-    shots.add(shot);
-    
-    shot = new Shot();
-    shot.setStartingByte(0);
-    shot.setLengthOfShot(235612800);
+    shot.setStartingByte(2799360000);
+    shot.setLengthOfShot(699840000);
     shots.add(shot);
   }
   
