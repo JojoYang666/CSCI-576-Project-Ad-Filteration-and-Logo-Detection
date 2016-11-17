@@ -7,12 +7,12 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class test {
 	public static void main(String[] args) {
-		File file = new File("/Users/Ralla/Documents/workspace/amplitude/data_test1.wav");
+		File file = new File("/Users/hyungjin/Downloads/dataset/Videos/data_test1.wav");
 		//File file = new File("/Users/Ralla/Documents/workspace/amplitude/10kHz_44100Hz_16bit_05sec.wav");
 		WaveFile wav;
 		long sum=0;
 		int count =0;
-		double dAvg, totalAvg =0;
+		double dAvg, totalAvgRMS =0;
 		   double preAvg =0;
 		    double differance=0;
 		int totalSec=0;
@@ -22,11 +22,13 @@ public class test {
 			//int amplitudeExample = wav.getSampleInt(140); // 140th amplitude value.
 			//System.out.println("amplitude:"+ amplitudeExample);
 			System.out.println("getFrameCount:"+ wav.getFramesCount());
-			totalSec=(int)SamplesToSeconds(wav.getFramesCount(),wav.getSampleRate());
+			totalSec=(int)SamplesToSeconds(wav.getFramesCount(),wav.getSampleRate()/30);
+			System.out.println("Total sec: "+totalSec);
+			
 			double []amps = new double[(int) totalSec];
 			double []tmepAmps = new double [(int)totalSec];
-			
-			double sumAmps=0;
+			int index = 0;
+			double sumRMS=0;
 			for (int i = 0; i < wav.getFramesCount(); i++) {
 			    int amplitude = wav.getSampleInt(i);
 			    count++;
@@ -36,17 +38,17 @@ public class test {
 			    
 			    
 			    
-			   sum += amplitude;
-			   if(count>=wav.getSampleRate()){
-					   dAvg = sum/count;
-				   float time = SamplesToSeconds(i,wav.getSampleRate());
+			   sum += Math.pow(amplitude,2);
+			   if(count>=wav.getSampleRate()/30){
+					   
 				   
 			
-			
-			  amps[(int) time]=dAvg;
-			  sumAmps+= dAvg;
-			 
-			   dAvg =0 ; 
+			  
+			  amps[index]= Math.sqrt(sum/count);
+			  
+			  sumRMS+= amps[index];
+			 index++;
+			   
 			  sum=0;
 			  count =0; 
 			 
@@ -54,13 +56,22 @@ public class test {
 			}
 			   
 			}
-			// Standard diviation 
-			totalAvg= sumAmps/totalSec;
 			
+			
+			for(int i =0; i<amps.length;i++){
+				System.out.println("frame #: "+i+"  RMS: "+amps[i]);
+			}
+			
+			totalAvgRMS= sumRMS/totalSec;
+			System.out.println("total AVG RMS:"+totalAvgRMS);
+			
+			// Standard diviation 
+			
+			/*
 			double sumOfAveSquare=0;
 			for (int i=0; i<amps.length;i++){
 				
-				tmepAmps[i]=Math.pow((amps[i]-totalAvg),2);
+				tmepAmps[i]=Math.pow((amps[i]-totalAvgRMS),2);
 				
 				sumOfAveSquare +=tmepAmps[i];
 			}
@@ -79,6 +90,7 @@ public class test {
 					System.out.println("Change in sound more that Sigma at "+i+"sec.");
 				}
 			}
+			*/
 		} catch (UnsupportedAudioFileException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
