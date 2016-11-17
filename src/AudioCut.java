@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 public class AudioCut
 {
@@ -48,10 +49,41 @@ public class AudioCut
     }
   }
   
+  private static void findOutliers2()
+  {
+    double sumRMS = 0;
+    for (double rms: rmses)
+    {
+      sumRMS += rms;
+    }
+    double averageRMS = sumRMS / rmses.length;
+    double sumRMSDifference = 0;
+    for (double rms: rmses)
+    {
+      sumRMSDifference += Math.abs(rms - averageRMS);
+    }
+    double max = averageRMS + (4 * (sumRMSDifference / rmses.length));
+    double min = averageRMS - (4 * (sumRMSDifference / rmses.length));
+    System.out.println("Max: " + max + " Min: " + min);
+    for (int i = 0; i < rmses.length; i++)
+    {
+      if (rmses[i] > max)
+      {
+        System.out.println("RMS" + i + " is out of threshold");
+        //System.out.println("max: " + rmses[i] + " " + max);
+      }
+      else if (rmses[i] < min)
+      {
+        System.out.println("RMS" + i + " is out of threshold");
+        //System.out.println("min: " + rmses[i] + " " + min);
+      }
+    }
+  }
+  
   private static void makeShots()
   {
     shots = new ArrayList<Shot>();
-    shot = new Shot();
+    Shot shot = new Shot();
     
     shot.setStartingByte(0);
     shot.setLengthOfShot(235612800);
@@ -118,48 +150,48 @@ public class AudioCut
     shot.setLengthOfShot(466560000);
     shots.add(shot);
     shot = new Shot();
-    shot.setStartingByte(2157840000);
+    shot.setStartingByte(2157840000L);
     shot.setLengthOfShot(12441600);
     shots.add(shot);
     shot = new Shot();
-    shot.setStartingByte(2170281600);
+    shot.setStartingByte(2170281600L);
     shot.setLengthOfShot(11664000);
     shots.add(shot);
     shot = new Shot();
-    shot.setStartingByte(2181945600);
+    shot.setStartingByte(2181945600L);
     shot.setLengthOfShot(33825600);
     shots.add(shot);
     shot = new Shot();
-    shot.setStartingByte(2215771200);
+    shot.setStartingByte(2215771200L);
     shot.setLengthOfShot(20995200);
     shots.add(shot);
     
     shot = new Shot();
-    shot.setStartingByte(2236766400);
+    shot.setStartingByte(2236766400L);
     shot.setLengthOfShot(36158400);
     shots.add(shot);
     shot = new Shot();
-    shot.setStartingByte(2272924800);
+    shot.setStartingByte(2272924800L);
     shot.setLengthOfShot(30715200);
     shots.add(shot);
     shot = new Shot();
-    shot.setStartingByte(2303640000);
+    shot.setStartingByte(2303640000L);
     shot.setLengthOfShot(24105600);
     shots.add(shot);
     shot = new Shot();
-    shot.setStartingByte(2327745600);
+    shot.setStartingByte(2327745600L);
     shot.setLengthOfShot(5054400);
     shots.add(shot);
     shot = new Shot();
-    shot.setStartingByte(2332800000);
+    shot.setStartingByte(2332800000L);
     shot.setLengthOfShot(174960000);
     shots.add(shot);
     shot = new Shot();
-    shot.setStartingByte(2507760000);
+    shot.setStartingByte(2507760000L);
     shot.setLengthOfShot(291600000);
     shots.add(shot);
     shot = new Shot();
-    shot.setStartingByte(2799360000);
+    shot.setStartingByte(2799360000L);
     shot.setLengthOfShot(699840000);
     shots.add(shot);
   }
@@ -214,6 +246,6 @@ public class AudioCut
     makeShots();
     openFile();
     readData();
-    findOutliers();
+    findOutliers2();
   }
 }
