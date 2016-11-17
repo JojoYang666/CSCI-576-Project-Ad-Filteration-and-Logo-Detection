@@ -1,21 +1,31 @@
 
 
 public class Shot{
+    private boolean isAd;
 	private double yMean;
-	private double ampMean;
+	private double rmsMean;
 	private long startingByte;
 	private long lengthOfShot;
 	
-	public Shot(double yMean, double ampMean, long startingByte, long lengthOfShot) {
+	public Shot(double yMean, double rmsMean, long startingByte, long lengthOfShot, boolean isAd) {
 		super();
 		this.yMean = yMean;
-		this.ampMean = ampMean;
+		this.rmsMean = rmsMean;
 		this.startingByte = startingByte;
 		this.lengthOfShot = lengthOfShot;
+        this.isAd = isAd;
 	}
 	
 	public Shot(){
 		
+	}
+  
+    public boolean getIsAd() {
+		return isAd;
+	}
+
+	public void setIsAd(boolean isAd) {
+		this.isAd = isAd;
 	}
 	
 	public double getyMean() {
@@ -26,12 +36,12 @@ public class Shot{
 		this.yMean = yMean;
 	}
 
-	public double getAmpMean() {
-		return ampMean;
+	public double getRMSMean() {
+		return rmsMean;
 	}
 
-	public void setAmpMean(double ampMean) {
-		this.ampMean = ampMean;
+	public void setRMSMean(double rmsMean) {
+		this.rmsMean = rmsMean;
 	}
 
 	public long getStartingByte() {
