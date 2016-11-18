@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class AudioCut
 {
   final private static String INPUT_FILE = "../../dataset/Videos/data_test1.wav";
+  final private static int BYTES_PER_VIDEO_FRAME = 388800;
   final private static int HEADER_SIZE = 44;
   final private static int SAMPLES_PER_FRAME = 1600;
   
@@ -17,6 +18,73 @@ public class AudioCut
   private static DataInputStream dis;
   private static double[] rmses;
   private static int bytesPerFrame = 2 * SAMPLES_PER_FRAME;
+  
+  private static void bucketSound()
+  {
+    try
+    {
+      dis.skip(44);
+      
+      long[] count = new long[Short.MAX_VALUE - Short.MIN_VALUE];
+      double[] entropies = new double[shots.size()];
+      
+      for (int i = 0; i < shots.size(); i++)
+      {
+        long numAmps = (shots.get(i).getLengthOfShot() / BYTES_PER_VIDEO_FRAME) * SAMPLES_PER_FRAME;
+        if (numAmps > (dis.available() / 2))
+        {
+          numAmps = dis.available() / 2;
+        }
+        for (int j = 0; j < numAmps; j++)
+        {
+          dis.readShort();
+        }
+      }
+    }
+    catch (IOException e) {Utilities.die("IOException");}
+  }
+  
+  private static void checkForZeroAmps()
+  {
+    try
+    {
+      dis.skip(44);
+      
+      ArrayList<Long> locations = new ArrayList<Long>();
+      int count = 0;
+      boolean isZero = false;
+      long i = 0;
+      
+      while (dis.available() != 0)
+      {
+        int amp = dis.readShort();
+        if (amp == 0)
+        {
+          count++;
+          if (count == 2)
+          {
+            locations.add(i - (count - 1));
+          }
+        }
+        else
+        {
+          count = 0;
+        }
+        i++;
+      }
+      
+      for (int j = 0; j < locations.size(); j++)
+      {
+        locations.set(j, locations.get(j) / 1600);
+      }
+      
+      for (long l: locations)
+      {
+        System.out.println(l);
+      }
+    }
+    catch (IOException e) {Utilities.die("IOException");}
+  }
   
   private static void findOutliers()
   {
@@ -51,32 +119,104 @@ public class AudioCut
   
   private static void findOutliers2()
   {
-    double sumRMS = 0;
-    for (double rms: rmses)
+    for (Shot shot: shots)
     {
-      sumRMS += rms;
-    }
-    double averageRMS = sumRMS / rmses.length;
-    double sumRMSDifference = 0;
-    for (double rms: rmses)
-    {
-      sumRMSDifference += Math.abs(rms - averageRMS);
-    }
-    double max = averageRMS + (4 * (sumRMSDifference / rmses.length));
-    double min = averageRMS - (4 * (sumRMSDifference / rmses.length));
-    System.out.println("Max: " + max + " Min: " + min);
-    for (int i = 0; i < rmses.length; i++)
-    {
-      if (rmses[i] > max)
+      long start = shot.getStartingByte();
+      long length = shot.getLengthOfShot();
+      int framesInShot = (int)(length / BYTES_PER_VIDEO_FRAME);
+      double sum = 0;
+      for (int i = 0; i < framesInShot; i++)
       {
-        System.out.println("RMS" + i + " is out of threshold");
-        //System.out.println("max: " + rmses[i] + " " + max);
+        sum += rmses[i];
       }
-      else if (rmses[i] < min)
+      shot.setRMSMean(sum/framesInShot);
+    }
+    
+    double lengthSum = 0;
+    double rmsSum = 0;
+    for (Shot shot: shots)
+    {
+      lengthSum += shot.getLengthOfShot();
+      rmsSum += shot.getRMSMean();
+    }
+    double averageLength = lengthSum / shots.size();
+    double averageRMS = rmsSum / shots.size();
+    double sumDifference = 0.0;
+    for (Shot shot: shots)
+    {
+      sumDifference += Math.abs((shot.getLengthOfShot() * shot.getRMSMean()) - (averageLength * averageRMS));
+    }
+    double max = (averageLength * averageRMS) + 2 * (sumDifference / shots.size());
+    double min = (averageLength * averageRMS) - 2 * (sumDifference / shots.size());
+System.out.println("Number of shots = " + shots.size());
+System.out.println("max: " + max + " min: " + min);
+// TH = (averageW * averageRMS +- 1/n * sumOf(abs(Wi*RMSi - averageW*averageRMS)))
+// where Wi = Li/Ltotal
+    for (int i = 0; i < shots.size(); i++)
+    {
+      double value = shots.get(i).getLengthOfShot() * shots.get(i).getRMSMean();
+      if (value > max)
       {
-        System.out.println("RMS" + i + " is out of threshold");
-        //System.out.println("min: " + rmses[i] + " " + min);
+        System.out.println("Value of shot " + i + " is out of threshold");
       }
+      else if (value < min)
+      {
+        System.out.println("Value of shot " + i + " is out of threshold");
+      }
+    }
+int count = 1;
+for (Shot s: shots)
+{
+  System.out.println(count + ": " + s.getLengthOfShot()/lengthSum);
+  count++;
+}
+  }
+  
+  private static void findOutliers3()
+  {
+    double lengthSum = 0;
+    for (Shot shot: shots)
+    {
+      lengthSum += shot.getLengthOfShot();
+    }
+    double averageLength = lengthSum / shots.size();
+    double sumDiffSquared = 0;
+    for (Shot shot: shots)
+    {
+      sumDiffSquared += Math.pow(shot.getLengthOfShot() - averageLength, 2);
+    }
+    double sd = Math.sqrt(sumDiffSquared / shots.size());
+    double max = averageLength + (sd);
+    double min = averageLength - (sd);
+    System.out.println("length = " + lengthSum);
+    System.out.println("average = " + averageLength + " sd = " + sd);
+    for (int i = 0; i < shots.size(); i++)
+    {
+      double value = shots.get(i).getLengthOfShot();
+      if (value < min)
+      {
+        System.out.println("Value of shot " + i + " is out of threshold");
+      }
+    }
+  }
+  
+  private static void findOutliers4()
+  {
+    double lengthSum = 0;
+    for (Shot shot: shots)
+    {
+      lengthSum += shot.getLengthOfShot();
+    }
+    System.out.println("length = " + lengthSum);
+    for (int i = 0; i < shots.size(); i++)
+    {
+      double value = shots.get(i).getLengthOfShot();
+      System.out.print("Shot" + (i+1) + " length = " + value/lengthSum + " ");
+      if (value / lengthSum < 0.02)
+      {
+        System.out.print("out of threshold");
+      }
+      System.out.println();
     }
   }
   
@@ -246,6 +386,59 @@ public class AudioCut
     makeShots();
     openFile();
     readData();
-    findOutliers2();
+    findOutliers5();
+    //checkForZeroAmps();
+    //bucketSound();
+  }
+  
+  private static void findOutliers5()
+  {
+    long sumLength = 0;
+    
+    for (Shot shot: shots)
+    {
+      long start = shot.getStartingByte();
+      long length = shot.getLengthOfShot();
+      sumLength += length;
+      int framesInShot = (int)(length / BYTES_PER_VIDEO_FRAME);
+      double sum = 0;
+      for (int i = 0; i < framesInShot; i++)
+      {
+        sum += rmses[i];
+      }
+      shot.setRMSMean(sum/framesInShot);
+    }
+    
+    System.out.println(sumLength);
+    double sumValue = 0;
+    
+    for (Shot shot: shots)
+    {
+      double value = shot.getRMSMean()/sumLength;
+      System.out.println(shot.getLengthOfShot() + " " + shot.getRMSMean() + " " + value);
+      sumValue += value;
+    }
+    
+    double sumDiffSquared = 0;
+    double average = sumValue/shots.size();
+    for (Shot shot: shots)
+    {
+      sumDiffSquared += Math.pow((shot.getRMSMean()/sumLength) - average, 2);
+    }
+    
+    double sd = Math.sqrt(sumDiffSquared / shots.size());
+    System.out.println(average);
+    System.out.println((.5*sd));
+    
+    double max = average + (.5*sd);
+    System.out.println("Max: " + max);
+    for (int i = 0; i < shots.size(); i++)
+    {
+      double value = shots.get(i).getRMSMean()/sumLength;
+      if (value > max)
+      {
+        System.out.println("Shot" + (i+1) + " is out of threshold: " + value);
+      }
+    }
   }
 }
