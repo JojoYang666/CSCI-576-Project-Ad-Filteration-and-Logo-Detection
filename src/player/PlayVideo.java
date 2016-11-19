@@ -64,49 +64,17 @@ public class PlayVideo implements Runnable {
         try {
             File file = new File(videoFileName);
             inputStream = new FileInputStream(file);
-
             numberOfFrames = file.length() / numberOfPixelsPerFrame;
-
-            JFrame frame = new JFrame();
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setTitle("MyPlayer");
-            frame.setSize(width + 100, height + 100);
-
-            JPanel buttonPanel = new JPanel();
-            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-            buttonPanel.setPreferredSize(new Dimension(100, 100));
-            frame.getContentPane().add(buttonPanel, BorderLayout.EAST);
-
-            buttonPanel.add(Box.createRigidArea(new Dimension(0, 25))); // Spacing
-
-            MyButton playButton = new MyButton("Play");
-            playButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-            buttonPanel.add(playButton);
-
-            buttonPanel.add(Box.createRigidArea(new Dimension(0, 25))); // Spacing
-
-            MyButton pauseButton = new MyButton("Pause");
-            pauseButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-            buttonPanel.add(pauseButton);
-
-            buttonPanel.add(Box.createRigidArea(new Dimension(0, 25))); // Spacing
-
-            MyButton stopButton = new MyButton("Stop");
-            stopButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-            buttonPanel.add(stopButton);
-
-            buttonPanel.add(Box.createRigidArea(new Dimension(0, 25))); // Spacing
-
-
             bytes = new byte[(int) numberOfPixelsPerFrame];
 
             PlayVideoComponent component = new PlayVideoComponent();
 
             // Number of Audio Samples Per Video Frame
             numberOfSamplesPerFrame = playSound.getSampleRate() / fps;
-            // System.out.println(numberOfSamplesPerFrame);
 
-            /*
+
+            // I don't care about sync. 30fps video player
+            /**
             running = true;
 
             final long OPTIMAL_DURATION = 1000000000 / targetFps; // Expected frame duration in nano seconds
@@ -134,9 +102,13 @@ public class PlayVideo implements Runnable {
                 while (System.nanoTime() - startTime < OPTIMAL_DURATION) {
                     Thread.yield();
                 }
-
+            }
             */
 
+
+            /**
+             *   Sync between audio and video
+             */
             // Video Frame offsets to sync audio and video
             int offset = 0;
 
@@ -148,9 +120,9 @@ public class PlayVideo implements Runnable {
                     // System.out.println("1: video < audio => FF video");
                     readBytes();
                     component.setImg(img);
-                    frame.add(component);
-                    frame.repaint();
-                    frame.setVisible(true);
+                    MyPlayer.frame.add(component);
+                    MyPlayer.frame.repaint();
+                    MyPlayer.frame.setVisible(true);
                     j++;
                 }
                 // Video ahead of audio, wait for audio to catch up
@@ -172,17 +144,17 @@ public class PlayVideo implements Runnable {
                         // System.out.println("4: video < audio => FF video");
                         readBytes();
                         component.setImg(img);
-                        frame.add(component);
-                        frame.repaint();
-                        frame.setVisible(true);
+                        MyPlayer.frame.add(component);
+                        MyPlayer.frame.repaint();
+                        MyPlayer.frame.setVisible(true);
                         i++;
                     }
 
                     readBytes();
                     component.setImg(img);
-                    frame.add(component);
-                    frame.repaint();
-                    frame.setVisible(true);
+                    MyPlayer.frame.add(component);
+                    MyPlayer.frame.repaint();
+                    MyPlayer.frame.setVisible(true);
                 }
             }
         }

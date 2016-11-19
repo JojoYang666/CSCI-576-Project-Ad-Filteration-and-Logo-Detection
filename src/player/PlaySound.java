@@ -65,6 +65,11 @@ public class PlaySound implements Runnable {
 
 		// Obtain the information about the AudioInputStream
 		audioFormat = audioInputStream.getFormat();
+
+
+
+
+		/*
 		Info info = new Info(SourceDataLine.class, audioFormat);
 
 		// opens the audio channel
@@ -96,6 +101,9 @@ public class PlaySound implements Runnable {
 			dataLine.drain();
 			dataLine.close();
 		}
+		*/
+
+
 
 	}
 	public long getPosition() {
