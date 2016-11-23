@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
 
 import colorConvert.ColorSpaceConverter;
 
@@ -25,8 +26,8 @@ public class QuotientHist {
 	private static int[] logoLHist = new int[101];
 	private static int[] quotientHist = new int[101];
 	private static int[][] vidLCorrected = new int[WIDTH][HEIGHT];
-	private static int[][] vidFrame = new int[WIDTH][HEIGHT];
-
+	private static ArrayList<Integer> pixelPos = new ArrayList<Integer>();	 
+	
 	public static void main(String[] args) {
 		videoFile = args[0];
 		logoFile = args[1];
@@ -51,6 +52,10 @@ public class QuotientHist {
 				for(int x = 0; x<WIDTH; x++){
 					output.print(vidLCorrected[x][y]);
 					output.print(" ");
+					if(vidLCorrected[x][y]!=0){
+						pixelPos.add(x);
+						pixelPos.add(y);
+					}
 				}
 				output.println();
 			}
@@ -58,6 +63,10 @@ public class QuotientHist {
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		
+		for(int i=0;i<pixelPos.size();i+=2){
+			System.out.println("(x,y): (" + pixelPos.get(i) + ", " + pixelPos.get(i+1) + ")");
 		}
 	}
 
