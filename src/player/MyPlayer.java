@@ -14,8 +14,8 @@ public class MyPlayer {
     static JFrame frame;
 
     public static void StartThread() {
-        String videoFilename = "data_test1.rgb";
-        String audioFilename = "data_test1.wav";
+        String videoFilename = "/home/akshayd31/CPRQ/University of Southern California/Fall 2016/CSCI 576: Multimedia Systems Design/Project/dataset/Videos/data_test1.rgb";
+        String audioFilename = "/home/akshayd31/CPRQ/University of Southern California/Fall 2016/CSCI 576: Multimedia Systems Design/Project/dataset/Videos/data_test1.wav";
 
         // opens the inputStream
         FileInputStream inputStream;
