@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
@@ -26,8 +27,8 @@ public class QuotientHist {
 	private static int[] logoLHist = new int[101];
 	private static int[] quotientHist = new int[101];
 	private static int[][] vidLCorrected = new int[WIDTH][HEIGHT];
-	private static ArrayList<Integer> pixelPos = new ArrayList<Integer>();	 
-	
+	private static ArrayList<Integer> pixelPos = new ArrayList<Integer>();
+
 	public static void main(String[] args) {
 		videoFile = args[0];
 		logoFile = args[1];
@@ -40,19 +41,19 @@ public class QuotientHist {
 		makeQuotient(vidLHist, logoLHist, quotientHist, 101);
 		getCorrectedImage(quotientHist, vidLCorrected, vidL);
 		int sum = 0;
-		for(int i = 0;i <101; i++){
+		for (int i = 0; i < 101; i++) {
 			sum += logoLHist[i];
 			System.out.println("L val = " + i + ": " + logoLHist[i]);
 		}
-		
+
 		System.out.println("Sum:" + sum);
 		try {
 			PrintStream output = new PrintStream(new File("output.txt"));
-			for(int y = 0; y<HEIGHT; y++){
-				for(int x = 0; x<WIDTH; x++){
+			for (int y = 0; y < HEIGHT; y++) {
+				for (int x = 0; x < WIDTH; x++) {
 					output.print(vidLCorrected[x][y]);
 					output.print(" ");
-					if(vidLCorrected[x][y]!=0){
+					if (vidLCorrected[x][y] != 0) {
 						pixelPos.add(x);
 						pixelPos.add(y);
 					}
@@ -64,10 +65,12 @@ public class QuotientHist {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		for(int i=0;i<pixelPos.size();i+=2){
-			System.out.println("(x,y): (" + pixelPos.get(i) + ", " + pixelPos.get(i+1) + ")");
+
+		for (int i = 0; i < pixelPos.size(); i += 2) {
+			System.out.println("(x,y): (" + pixelPos.get(i) + ", " + pixelPos.get(i + 1) + ")");
 		}
+
+		makeFrame(pixelPos);
 	}
 
 	public static void openVideo(String fileName) {
@@ -105,7 +108,7 @@ public class QuotientHist {
 					byte b = bytes[ind + HEIGHT * WIDTH * 2];
 					ind++;
 
-					ans =  ColorSpaceConverter.converter((int) (r+128), (int) (g+128), (int) (b+128));
+					ans = ColorSpaceConverter.converter((int) (r + 128), (int) (g + 128), (int) (b + 128));
 					L[x][y] = ans[0];
 					A[x][y] = ans[1];
 					B[x][y] = ans[2];
@@ -117,32 +120,54 @@ public class QuotientHist {
 		}
 		// randFile.seek(0);
 	}
-	
-	public static void makeHist(int[][] channelVals, int[] histogram, int len){
-		for(int y = 0; y<len; y++)
+
+	public static void makeHist(int[][] channelVals, int[] histogram, int len) {
+		for (int y = 0; y < len; y++)
 			histogram[y] = 0;
-		
-		for(int y = 0; y<HEIGHT; y++){
-			for(int x = 0; x<WIDTH; x++){
+
+		for (int y = 0; y < HEIGHT; y++) {
+			for (int x = 0; x < WIDTH; x++) {
 				histogram[channelVals[x][y]]++;
 			}
 		}
 	}
-	
-	public static void makeQuotient(int[] vidHist, int[] logoHist, int[] quotientHist, int len){
-		for(int i = 0; i<len; i++){
-			if(vidHist[i]!=0)
-				quotientHist[i] = logoHist[i]/vidHist[i];
+
+	public static void makeQuotient(int[] vidHist, int[] logoHist, int[] quotientHist, int len) {
+		for (int i = 0; i < len; i++) {
+			if (vidHist[i] != 0)
+				quotientHist[i] = logoHist[i] / vidHist[i];
 			else
 				quotientHist[i] = 0;
 		}
 	}
-	
-	public static void getCorrectedImage(int[] quotientHist, int[][] vidLCorrected, int[][] vidL){
-		for(int y = 0; y<HEIGHT; y++){
-			for(int x = 0; x<WIDTH; x++){
+
+	public static void getCorrectedImage(int[] quotientHist, int[][] vidLCorrected, int[][] vidL) {
+		for (int y = 0; y < HEIGHT; y++) {
+			for (int x = 0; x < WIDTH; x++) {
 				vidLCorrected[x][y] = quotientHist[vidL[x][y]];
 			}
+		}
+	}
+
+	public static void makeFrame(ArrayList<Integer> pixelPos) {
+		byte[] frame = new byte[388800];
+
+		for (int i = 0; i < BYTES_PER_FRAME; i++)
+			frame[i] = 0;
+
+		for (int i = 0; i < pixelPos.size(); i += 2) {
+			frame[(pixelPos.get(i + 1) * WIDTH) + pixelPos.get(i)] = -127;
+			frame[(pixelPos.get(i + 1) * WIDTH) + pixelPos.get(i) + (WIDTH * HEIGHT)] = -127;
+			frame[(pixelPos.get(i + 1)) + pixelPos.get(i) + (WIDTH * HEIGHT * 2)] = -127;
+		}
+
+		try {
+			FileOutputStream fos = new FileOutputStream("frame.rgb");
+			fos.write(frame);
+			fos.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }
