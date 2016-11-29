@@ -181,6 +181,10 @@ public class AudioCut {
 			System.out.println();
 		}
 	}
+  
+    private static int getAmp(byte b0, byte b1) {
+        return(((b1 & 0xff) << 8) | (b0 & 0xff));
+    }
 
 	private static void makeShots() {
 		shots = new ArrayList<Shot>();
@@ -324,7 +328,8 @@ public class AudioCut {
 				int n = 0;
 				double sum = 0;
 				for (int i = 0; i < (bytesToRead / 2); i++) {
-					int amp = dis.readShort();
+					//int amp = getAmp(dis.readByte(), dis.readByte());
+                    int amp = dis.readShort();
 					sum += (amp * amp);
 					n++;
 				}
@@ -340,7 +345,11 @@ public class AudioCut {
 		makeShots();
 		openFile();
 		readData();
-		findOutliers5();
+  for (double d: rmses)
+  {
+    System.out.println(d);
+  }
+		//findOutliers5();
 		// checkForZeroAmps();
 		// bucketSound();
 	}
