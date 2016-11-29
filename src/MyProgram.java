@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class MyProgram {
 	private static ArrayList<Shot> shots;
 	private static final int width = 480, height = 270;
+	private static final int BYTES_PER_VIDEO_FRAME = 388800;
 	private ArrayList<Scene> scenes;
 	private static ArrayList<Double> valsY = new ArrayList<Double>();
 	private static ArrayList<Double> valsU = new ArrayList<Double>();
@@ -88,9 +89,12 @@ public class MyProgram {
 					if(votes>=2){
 //						System.out.println("THAT'S A SHOT, BOYS! " + offset);
 						shots.get(shots.size() - 1).setLengthOfShot((offset * fReader.getLen()) - shots.get(shots.size() - 1).getStartingByte());
+						shots.get(shots.size() - 1).setEndingFrame(((offset * fReader.getLen())/BYTES_PER_VIDEO_FRAME)-1);
 //						System.out.println(shots.get(shots.size()-1).getStartingByte() + " " + offset*fReader.getLen() + " " + shots.get(shots.size()-1).getLengthOfShot());
 						shots.add(new Shot());
 						shots.get(shots.size()-1).setStartingByte(offset*fReader.getLen());
+						shots.get(shots.size() - 1).setStartingFrame((offset*fReader.getLen())/BYTES_PER_VIDEO_FRAME);
+						shots.get(shots.size() - 1).setAd(false);
 						firstFrameDiffEstimate = true;
 						valsY.clear();
 						valsU.clear();
@@ -113,6 +117,8 @@ public class MyProgram {
 				System.out.println("Starting with " + offset);
 				shots.add(new Shot());
 				shots.get(shots.size() - 1).setStartingByte(offset * fReader.getLen());
+				shots.get(shots.size() - 1).setStartingFrame((offset * fReader.getLen())/BYTES_PER_VIDEO_FRAME);
+				shots.get(shots.size() - 1).setAd(false);
 				currentYUV = fReader.read();
 				currentYMatrix = currentYUV.getY();
 				currentUMatrix = currentYUV.getU();
@@ -134,6 +140,7 @@ public class MyProgram {
 		}
 
 		shots.get(shots.size() - 1).setLengthOfShot(fReader.getFileLength() - shots.get(shots.size() - 1).getStartingByte());
+		shots.get(shots.size() - 1).setEndingFrame((fReader.getFileLength()/BYTES_PER_VIDEO_FRAME)-1);
 	}
 
 	private static double calcThreshold(ArrayList<Double> vals){
