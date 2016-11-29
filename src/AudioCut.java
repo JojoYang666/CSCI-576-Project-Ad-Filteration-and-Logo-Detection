@@ -8,7 +8,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 public class AudioCut {
-	final private static String INPUT_FILE = "../../dataset/Videos/data_test1.wav";
+	final private static String INPUT_FILE_1 = "../../dataset/Videos/data_test1.wav";
+    final private static String INPUT_FILE_2 = "../../dataset2/Videos/data_test2.wav";
 	final private static int BYTES_PER_VIDEO_FRAME = 388800;
 	final private static int HEADER_SIZE = 44;
 	final private static int SAMPLES_PER_FRAME = 1600;
@@ -303,7 +304,7 @@ public class AudioCut {
 
 	private static void openFile() {
 		try {
-			File file = new File(INPUT_FILE);
+			File file = new File(INPUT_FILE_1);
 			InputStream inputFileStream = new BufferedInputStream(new FileInputStream(file));
 			dis = new DataInputStream(inputFileStream);
 
@@ -328,11 +329,13 @@ public class AudioCut {
 				int n = 0;
 				double sum = 0;
 				for (int i = 0; i < (bytesToRead / 2); i++) {
-					//int amp = getAmp(dis.readByte(), dis.readByte());
-                    int amp = dis.readShort();
+					long amp = getAmp(dis.readByte(), dis.readByte());
+                    //int amp = dis.readShort();
+//System.out.println(amp + " " + (amp * amp));
 					sum += (amp * amp);
 					n++;
 				}
+//System.out.println(sum);
 				rmses[index++] = Math.sqrt(sum / n);
 				bytesToRead = dis.available();
 			}
@@ -345,10 +348,31 @@ public class AudioCut {
 		makeShots();
 		openFile();
 		readData();
-  for (double d: rmses)
+double sum = 0;
+for (int i = 0; i < rmses.length; i++)
+{
+  sum += rmses[i];
+}
+double average = sum / rmses.length;
+double sumDiffSquared = 0;
+for (double d: rmses)
+{
+  sumDiffSquared += Math.pow((d - average), 2);
+}
+double sd = Math.sqrt(sumDiffSquared / rmses.length);
+int SD_MULTIPLIER = 1;
+System.out.println((average + SD_MULTIPLIER * sd) + " " + (average - SD_MULTIPLIER * sd));
+for (int i = 0; i < rmses.length; i++)
+{
+  if (rmses[i] > (average + (SD_MULTIPLIER * sd)))
   {
-    System.out.println(d);
+    System.out.println((i + 1) + ":" + rmses[i]);
   }
+  else if (rmses[i] < (average - (SD_MULTIPLIER * sd)))
+  {
+    System.out.println((i + 1) + ":" + rmses[i]);
+  }
+}
 		//findOutliers5();
 		// checkForZeroAmps();
 		// bucketSound();
