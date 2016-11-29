@@ -94,7 +94,6 @@ public class MyProgram {
 						shots.add(new Shot());
 						shots.get(shots.size()-1).setStartingByte(offset*fReader.getLen());
 						shots.get(shots.size() - 1).setStartingFrame((offset*fReader.getLen())/BYTES_PER_VIDEO_FRAME);
-						shots.get(shots.size() - 1).setAd(false);
 						firstFrameDiffEstimate = true;
 						valsY.clear();
 						valsU.clear();
@@ -118,7 +117,6 @@ public class MyProgram {
 				shots.add(new Shot());
 				shots.get(shots.size() - 1).setStartingByte(offset * fReader.getLen());
 				shots.get(shots.size() - 1).setStartingFrame((offset * fReader.getLen())/BYTES_PER_VIDEO_FRAME);
-				shots.get(shots.size() - 1).setAd(false);
 				currentYUV = fReader.read();
 				currentYMatrix = currentYUV.getY();
 				currentUMatrix = currentYUV.getU();
