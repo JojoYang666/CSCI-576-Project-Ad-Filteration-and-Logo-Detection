@@ -6,6 +6,7 @@ public class Shot{
 	private double rmsMean;
 	private long startingByte;
 	private long lengthOfShot;
+    private int audioVoteCount;
 	
 	public Shot(double yMean, double rmsMean, long startingByte, long lengthOfShot, boolean isAd) {
 		super();
@@ -18,6 +19,14 @@ public class Shot{
 	
 	public Shot(){
 		
+	}
+  
+    public boolean getAudioVoteCount() {
+		return this.audioVoteCount;
+	}
+
+	public void setAudioVoteCount(int num) {
+		this.audioVoteCount = num;
 	}
   
     public boolean getIsAd() {
