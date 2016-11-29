@@ -67,6 +67,10 @@ public class Shot{
 	public int getAudioVoteCount() {
 		return audioVoteCount;
 	}
+  
+    public void incrementAudioVoteCount() {
+        this.audioVoteCount++;
+    }
 	
 	public void setAudioVoteCount(int audioVoteCount) {
 		this.audioVoteCount = audioVoteCount;
