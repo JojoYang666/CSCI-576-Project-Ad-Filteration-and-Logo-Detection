@@ -28,12 +28,13 @@ public class MyProgram {
 		parseArgs(args);
 		FrameReader fReader = new FrameReader(inputVideoFile, width, height);
 		makeShots(fReader);
+        AudioCut.voteShots(shots, inputAudioFile);
 		System.out.println("SIZE OF FILE - " + fReader.getFileLength());
 		System.out.println("SIZE OF SHOTS - " + shots.size());
 		for (Shot s : shots) {
-			System.out.println("SHOT: " + s.getStartingByte() + "   " + s.getLengthOfShot());
+			System.out.println("SHOT: " + s.getStartingByte() + "   " + s.getLengthOfShot() + " | " + s.isAd() + " " + s.getAudioVoteCount() + " " + s.getStartingFrame() + " " + s.getEndingFrame());
 		}
-		writeToDisk();
+		//writeToDisk();
 		// makeScenes();
 		fReader.close();
 	}
@@ -254,12 +255,12 @@ public class MyProgram {
 	}
 
 	private static void parseArgs(String[] args) {
-		if (args.length != 1) {
+		if (args.length != 2) {
 			Utilities.die("Not enough arguments! \nUsage java MyProgram input.rgb input.wav output.rgb output.wav");
 		}
 
 		inputVideoFile = args[0];
-		// inputAudioFile = args[1];
+		inputAudioFile = args[1];
 		// outputVideoFile = args[2];
 		// outputAudioFile = args[3];
 	}

@@ -450,18 +450,16 @@ public class AudioCut {
         final int SD_MULTIPLIER = 1;
         double max = averageRMS + (SD_MULTIPLIER * sd);
         double min = averageRMS - (SD_MULTIPLIER * sd);
-        int shotsIndex = 0;
-        for (int i = 0; i < rmses.length; i++) {
-            if ((rmses[i] > max) || (rmses[i] < min)) {
-                while (i < shots.get(shotsIndex).getStartingFrame()) {
-                    shotsIndex++;
-                    shots.get(shotsIndex).setNumberOfFrames(shots.get(shotsIndex).getEndingFrame() - shots.get(shotsIndex).getStartingFrame());
+      
+        for (Shot s: shots) {
+            s.setNumberOfFrames(s.getEndingFrame() - s.getStartingFrame());
+            for (int i = (int)s.getStartingFrame(); i < (int)s.getEndingFrame() && i < rmses.length; i++) {
+                if ((rmses[i] > max) || (rmses[i] < min)) {
+                    s.incrementAudioVoteCount();
                 }
-              
-                shots.get(shotsIndex).incrementAudioVoteCount();
-                if (!shots.get(shotsIndex).isAd() && (((double)shots.get(shotsIndex).getAudioVoteCount() / shots.get(shotsIndex).getNumberOfFrames()) >= 0.1)) {
-                    shots.get(shotsIndex).setAd(true);
-                }
+            }
+            if (((((double)s.getAudioVoteCount()) / s.getNumberOfFrames()) >= 0.1)) {  // add a && if greater than average number of frames
+                s.setAd(true);
             }
         }
     }
