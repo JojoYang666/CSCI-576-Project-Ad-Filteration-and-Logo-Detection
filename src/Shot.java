@@ -9,6 +9,8 @@ public class Shot{
 	private long endingFrame;
 	
 	public Shot() {
+		this.audioVoteCount = 0;
+		this.isAd = false;
 	}
 	
 	public Shot(boolean isAd, double yMean, double rmsMean, long startingByte, long lengthOfShot, int audioVoteCount,
