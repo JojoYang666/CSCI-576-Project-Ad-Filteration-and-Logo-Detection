@@ -7,6 +7,7 @@ public class Shot{
     private int audioVoteCount;
     private long startingFrame;
 	private long endingFrame;
+    private long numberOfFrames;
 	
 	public Shot() {
 		this.audioVoteCount = 0;
@@ -24,6 +25,7 @@ public class Shot{
 		this.audioVoteCount = audioVoteCount;
 		this.startingFrame = startingFrame;
 		this.endingFrame = endingFrame;
+        this.numberOfFrames = endingFrame - startingFrame;
 	}
 
 	public boolean isAd() {
@@ -67,7 +69,7 @@ public class Shot{
 	}
 	
 	public int getAudioVoteCount() {
-		return audioVoteCount;
+		return this.audioVoteCount;
 	}
   
     public void incrementAudioVoteCount() {
@@ -93,4 +95,12 @@ public class Shot{
 	public void setEndingFrame(long endingFrame) {
 		this.endingFrame = endingFrame;
 	}
+  
+    public long getNumberOfFrames() {
+        return this.numberOfFrames;
+    }
+  
+    public void setNumberOfFrames(long num) {
+        this.numberOffFrames = num;
+    }
 }
