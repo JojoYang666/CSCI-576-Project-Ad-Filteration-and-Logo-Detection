@@ -101,6 +101,6 @@ public class Shot{
     }
   
     public void setNumberOfFrames(long num) {
-        this.numberOffFrames = num;
+        this.numberOfFrames = num;
     }
 }

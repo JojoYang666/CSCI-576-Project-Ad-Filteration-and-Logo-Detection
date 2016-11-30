@@ -107,20 +107,20 @@ public class AudioCut {
 			for (int i = 0; i < framesInShot; i++) {
 				sum += rmses[i];
 			}
-			shot.setRMSMean(sum / framesInShot);
+			shot.setRmsMean(sum / framesInShot);
 		}
 
 		double lengthSum = 0;
 		double rmsSum = 0;
 		for (Shot shot : shots) {
 			lengthSum += shot.getLengthOfShot();
-			rmsSum += shot.getRMSMean();
+			rmsSum += shot.getRmsMean();
 		}
 		double averageLength = lengthSum / shots.size();
 		double averageRMS = rmsSum / shots.size();
 		double sumDifference = 0.0;
 		for (Shot shot : shots) {
-			sumDifference += Math.abs((shot.getLengthOfShot() * shot.getRMSMean()) - (averageLength * averageRMS));
+			sumDifference += Math.abs((shot.getLengthOfShot() * shot.getRmsMean()) - (averageLength * averageRMS));
 		}
 		double max = (averageLength * averageRMS) + 2 * (sumDifference / shots.size());
 		double min = (averageLength * averageRMS) - 2 * (sumDifference / shots.size());
@@ -130,7 +130,7 @@ public class AudioCut {
 		// averageW*averageRMS)))
 		// where Wi = Li/Ltotal
 		for (int i = 0; i < shots.size(); i++) {
-			double value = shots.get(i).getLengthOfShot() * shots.get(i).getRMSMean();
+			double value = shots.get(i).getLengthOfShot() * shots.get(i).getRmsMean();
 			if (value > max) {
 				System.out.println("Value of shot " + i + " is out of threshold");
 			} else if (value < min) {
@@ -348,31 +348,6 @@ public class AudioCut {
 		makeShots();
 		openFile();
 		readData();
-double sum = 0;
-for (int i = 0; i < rmses.length; i++)
-{
-  sum += rmses[i];
-}
-double average = sum / rmses.length;
-double sumDiffSquared = 0;
-for (double d: rmses)
-{
-  sumDiffSquared += Math.pow((d - average), 2);
-}
-double sd = Math.sqrt(sumDiffSquared / rmses.length);
-int SD_MULTIPLIER = 1;
-System.out.println((average + SD_MULTIPLIER * sd) + " " + (average - SD_MULTIPLIER * sd));
-for (int i = 0; i < rmses.length; i++)
-{
-  if (rmses[i] > (average + (SD_MULTIPLIER * sd)))
-  {
-    System.out.println((i + 1) + ":" + rmses[i]);
-  }
-  else if (rmses[i] < (average - (SD_MULTIPLIER * sd)))
-  {
-    System.out.println((i + 1) + ":" + rmses[i]);
-  }
-}
 		//findOutliers5();
 		// checkForZeroAmps();
 		// bucketSound();
@@ -391,16 +366,16 @@ for (int i = 0; i < rmses.length; i++)
 			for (int i = 0; i < framesInShot; i++) {
 				sum += rmses[i];
 			}
-			shot.setRMSMean(sum / framesInShot);
+			shot.setRmsMean(sum / framesInShot);
 		}
 
 		System.out.println(sumLength);
 		double sumValue = 0;
 
 		for (Shot shot : shots) {
-			double value = shot.getRMSMean() / sumLength;
+			double value = shot.getRmsMean() / sumLength;
 			probAd.add(value);
-			System.out.println(shot.getLengthOfShot() + " " + shot.getRMSMean() + " " + value);
+			System.out.println(shot.getLengthOfShot() + " " + shot.getRmsMean() + " " + value);
 //			sumValue += value;
 		}
 
@@ -427,4 +402,67 @@ for (int i = 0; i < rmses.length; i++)
 			}
 		}
 	}
+  
+  
+    // To be called by MyProgram to update shots array
+    public static void voteShots(ArrayList<Shot> shots, String filename) {
+        try {
+			File file = new File(filename);
+			InputStream inputFileStream = new BufferedInputStream(new FileInputStream(file));
+			dis = new DataInputStream(inputFileStream);
+
+			double dataSize = (double) (file.length() - HEADER_SIZE);
+			double arraySize = Math.ceil(dataSize / bytesPerFrame);
+			rmses = new double[(int) arraySize];
+          
+          
+            dis.skip(44);
+
+			int index = 0;
+			int bytesToRead = dis.available();
+			while (bytesToRead != 0) {
+				if (bytesToRead > bytesPerFrame) {
+					bytesToRead = bytesPerFrame;
+				}
+				int n = 0;
+				double sum = 0;
+				for (int i = 0; i < (bytesToRead / 2); i++) {
+					long amp = getAmp(dis.readByte(), dis.readByte());
+					sum += (amp * amp);
+					n++;
+				}
+				rmses[index++] = Math.sqrt(sum / n);
+				bytesToRead = dis.available();
+			}
+		}
+        catch (FileNotFoundException e) {Utilities.die("FileNotFound");}
+        catch (IOException e) {Utilities.die("IOException");}
+      
+
+        double sumRMS = 0;
+        for (double d: rmses) {sumRMS += d;}
+        double averageRMS = sumRMS / rmses.length;
+        double sumDiffSquared = 0;
+        for (double d: rmses) {
+            sumDiffSquared += Math.pow((d - averageRMS), 2);
+        }
+        double sd = Math.sqrt(sumDiffSquared / rmses.length);
+        final int SD_MULTIPLIER = 1;
+        double max = averageRMS + (SD_MULTIPLIER * sd);
+        double min = averageRMS - (SD_MULTIPLIER * sd);
+        int shotsIndex = 0;
+        for (int i = 0; i < rmses.length; i++) {
+            if ((rmses[i] > max) || (rmses[i] < min)) {
+                while (i < shots.get(shotsIndex).getStartingFrame()) {
+                    shotsIndex++;
+                    shots.get(shotsIndex).setNumberOfFrames(shots.get(shotsIndex).getEndingFrame() - shots.get(shotsIndex).getStartingFrame());
+                }
+              
+                shots.get(shotsIndex).incrementAudioVoteCount();
+                if (!shots.get(shotsIndex).isAd() && (((double)shots.get(shotsIndex).getAudioVoteCount() / shots.get(shotsIndex).getNumberOfFrames()) >= 0.1)) {
+                    shots.get(shotsIndex).setAd(true);
+                }
+            }
+        }
+    }
 }
