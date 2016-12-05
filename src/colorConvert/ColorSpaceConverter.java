@@ -215,26 +215,51 @@ public class ColorSpaceConverter {
 	
 	public static double[] RGBtoHSL(int R, int G, int B){
 		double[] result = new double[3];
-		int M = Math.max(R, G);
-		M= Math.max(M, B);
-		int m = Math.min(R, G);
-		m= Math.min(m, B);
-		int d = (M-m)/255;
+		
+		double vR = R/255;
+		double vG=G/255;
+		double vB=B/255;
 		double H=0;
+		double S = 0; 
+		double M = Math.max(vR, vG);
+		M= Math.max(M, vB);
+		double m = Math.min(vR, vG);
+		m= Math.min(m, B);
+		double d = (M-m);
 		
-		int L = (M+m)/510;
+		double L = (M+m)/2;
+		if(d ==0){
+			H=0;
+			S=0;
+		}
 		
-		int S = 0; 
+		else {
+			if(L<0.5)
+				S=d/(M+m);
+			else{
+				S= d/(2-M-m);
+			}
+			
+			double del_R = (((M-vR)/6) +(d/2))/d;
+
+			double del_G = (((M-vG)/6) +(d/2))/d;
+
+			double del_B = (((M-vB)/6) +(d/2))/d;
+			
+			if(vR ==M) H=del_B=del_G;
+			else if (vG== M) H = (1/3)+del_R-del_B;
+			else if (vB==M) H= (2/3)+del_G-del_R;
+
+			
+			if(H<0)H+=1;
+			if(H>1) H-=1;
+			
+		}
 		
-		if(L>0){
-			S=d/(1-Math.abs(2*L-1));
-		}
-		if(G>= B){
-		H = Math.acos((R-1/2*G - 1/2*B)/Math.sqrt(R*R +G*G+B*B -R*G-R*B-G*B));
-		}
-		if(B>G){
-			H=360- Math.acos((R-1/2*G - 1/2*B)/Math.sqrt(R*R +G*G+B*B -R*G-R*B-G*B));
-		}
+		
+		
+		
+	
 		result[0]=H;
 		result[1]=S;
 		result[2]=L;
