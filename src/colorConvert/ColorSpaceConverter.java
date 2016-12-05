@@ -52,23 +52,23 @@ public class ColorSpaceConverter {
 		L = rf[0];
 		a = rf[1];
 		b = rf[2];
-		labVals[0] = (int)L;
-		labVals[1] = (int)a;
-		labVals[2] = (int)b;
-		
-		if(labVals[0]<0)
+		labVals[0] = (int) L;
+		labVals[1] = (int) a;
+		labVals[2] = (int) b;
+
+		if (labVals[0] < 0)
 			labVals[0] = 0;
-		if(labVals[0]>100)
+		if (labVals[0] > 100)
 			labVals[0] = 100;
-		
-		if(labVals[1]<-128)
+
+		if (labVals[1] < -128)
 			labVals[1] = -128;
-		if(labVals[1]>128)
+		if (labVals[1] > 128)
 			labVals[1] = 128;
-		
-		if(labVals[2]<-128)
+
+		if (labVals[2] < -128)
 			labVals[2] = -128;
-		if(labVals[2]>128)
+		if (labVals[2] > 128)
 			labVals[2] = 128;
 		return labVals;
 		// for each argument
@@ -212,36 +212,34 @@ public class ColorSpaceConverter {
 		return XYZtoLAB(RGBtoXYZ(RGB));
 	}
 
-	
-	public static double[] RGBtoHSL(int R, int G, int B){
+	public static double[] RGBtoHSL(int R, int G, int B) {
 		double[] result = new double[3];
 		int M = Math.max(R, G);
-		M= Math.max(M, B);
+		M = Math.max(M, B);
 		int m = Math.min(R, G);
-		m= Math.min(m, B);
-		int d = (M-m)/255;
-		double H=0;
-		
-		int L = (M+m)/510;
-		
-		int S = 0; 
-		
-		if(L>0){
-			S=d/(1-Math.abs(2*L-1));
+		m = Math.min(m, B);
+		int d = (M - m) / 255;
+		double H = 0;
+
+		float L = (M + m) / 510;
+
+		float S = 0;
+
+		if (L > 0) {
+			S = d / (1 - Math.abs(2 * L - 1));
 		}
-		if(G>= B){
-		H = Math.acos((R-1/2*G - 1/2*B)/Math.sqrt(R*R +G*G+B*B -R*G-R*B-G*B));
+		if (G >= B) {
+			H = Math.acos((R - 1 / 2 * G - 1 / 2 * B) / Math.sqrt(R * R + G * G + B * B - R * G - R * B - G * B));
 		}
-		if(B>G){
-			H=360- Math.acos((R-1/2*G - 1/2*B)/Math.sqrt(R*R +G*G+B*B -R*G-R*B-G*B));
+		if (B > G) {
+			H = 360 - Math.acos((R - 1 / 2 * G - 1 / 2 * B) / Math.sqrt(R * R + G * G + B * B - R * G - R * B - G * B));
 		}
-		result[0]=H;
-		result[1]=S;
-		result[2]=L;
+		result[0] = H;
+		result[1] = S;
+		result[2] = L;
 		return result;
 	}
-	
-	
+
 	/**
 	 * Convert RGB to XYZ
 	 * 
@@ -250,9 +248,7 @@ public class ColorSpaceConverter {
 	 * @param B
 	 * @return XYZ in double array.
 	 */
-	
-	
-	
+
 	public static double[] RGBtoXYZ(int R, int G, int B) {
 		double[] result = new double[3];
 
