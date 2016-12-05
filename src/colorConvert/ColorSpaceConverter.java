@@ -200,7 +200,7 @@ public class ColorSpaceConverter {
 	 * @param B
 	 * @return Lab values
 	 */
-	public double[] RGBtoLAB(int R, int G, int B) {
+	public static double[] RGBtoLAB(int R, int G, int B) {
 		return XYZtoLAB(RGBtoXYZ(R, G, B));
 	}
 
@@ -212,6 +212,36 @@ public class ColorSpaceConverter {
 		return XYZtoLAB(RGBtoXYZ(RGB));
 	}
 
+	
+	public static double[] RGBtoHSL(int R, int G, int B){
+		double[] result = new double[3];
+		int M = Math.max(R, G);
+		M= Math.max(M, B);
+		int m = Math.min(R, G);
+		m= Math.min(m, B);
+		int d = (M-m)/255;
+		double H=0;
+		
+		int L = (M+m)/510;
+		
+		int S = 0; 
+		
+		if(L>0){
+			S=d/(1-Math.abs(2*L-1));
+		}
+		if(G>= B){
+		H = Math.acos((R-1/2*G - 1/2*B)/Math.sqrt(R*R +G*G+B*B -R*G-R*B-G*B));
+		}
+		if(B>G){
+			H=360- Math.acos((R-1/2*G - 1/2*B)/Math.sqrt(R*R +G*G+B*B -R*G-R*B-G*B));
+		}
+		result[0]=H;
+		result[1]=S;
+		result[2]=L;
+		return result;
+	}
+	
+	
 	/**
 	 * Convert RGB to XYZ
 	 * 
@@ -220,7 +250,10 @@ public class ColorSpaceConverter {
 	 * @param B
 	 * @return XYZ in double array.
 	 */
-	public double[] RGBtoXYZ(int R, int G, int B) {
+	
+	
+	
+	public static double[] RGBtoXYZ(int R, int G, int B) {
 		double[] result = new double[3];
 
 		// convert 0..255 into 0..1
@@ -303,7 +336,7 @@ public class ColorSpaceConverter {
 	 * @param Z
 	 * @return Lab values
 	 */
-	public double[] XYZtoLAB(double X, double Y, double Z) {
+	public static double[] XYZtoLAB(double X, double Y, double Z) {
 
 		double x = X / D65[0];
 		double y = Y / D65[1];
@@ -340,7 +373,7 @@ public class ColorSpaceConverter {
 	 * @param XYZ
 	 * @return Lab values
 	 */
-	public double[] XYZtoLAB(double[] XYZ) {
+	public static double[] XYZtoLAB(double[] XYZ) {
 		return XYZtoLAB(XYZ[0], XYZ[1], XYZ[2]);
 	}
 
