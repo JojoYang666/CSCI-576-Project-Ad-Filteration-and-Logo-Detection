@@ -214,56 +214,40 @@ public class ColorSpaceConverter {
 
 	
 	public static double[] RGBtoHSL(int R, int G, int B){
-		double[] result = new double[3];
-		
-		double vR = R/255;
-		double vG=G/255;
-		double vB=B/255;
-		double H=0;
-		double S = 0; 
-		double M = Math.max(vR, vG);
-		M= Math.max(M, vB);
-		double m = Math.min(vR, vG);
-		m= Math.min(m, B);
-		double d = (M-m);
-		
-		double L = (M+m)/2;
-		if(d ==0){
-			H=0;
-			S=0;
-		}
-		
-		else {
-			if(L<0.5)
-				S=d/(M+m);
-			else{
-				S= d/(2-M-m);
-			}
-			
-			double del_R = (((M-vR)/6) +(d/2))/d;
-
-			double del_G = (((M-vG)/6) +(d/2))/d;
-
-			double del_B = (((M-vB)/6) +(d/2))/d;
-			
-			if(vR ==M) H=del_B=del_G;
-			else if (vG== M) H = (1/3)+del_R-del_B;
-			else if (vB==M) H= (2/3)+del_G-del_R;
-
-			
-			if(H<0)H+=1;
-			if(H>1) H-=1;
-			
-		}
-		
-		
-		
-		
-	
-		result[0]=H;
-		result[1]=S;
-		result[2]=L;
-		return result;
+		double[] hsl= new double[3];	
+		float r = R / 255.f;
+			 float g = G / 255.f;
+			 float b = B/ 255.f;
+			 float max = Math.max(Math.max(r, g), b);
+			 float min = Math.min(Math.min(r, g), b);
+			 float c = max - min;
+			 
+			 float h_ = 0.f;
+			 if (c == 0) {
+			  h_ = 0;
+			 } else if (max == r) {
+			  h_ = (float)(g-b) / c;
+			  if (h_ < 0) h_ += 6.f;
+			 } else if (max == g) {
+			  h_ = (float)(b-r) / c + 2.f;
+			 } else if (max == b) {
+			  h_ = (float)(r-g) / c + 4.f;
+			 }
+			 float h = 60.f * h_;
+			 
+			 float l = (max + min) * 0.5f;
+			 
+			 float s;
+			 if (c == 0) {
+			  s = 0.f;
+			 } else {
+			  s = c / (1 - Math.abs(2.f * l - 1.f));
+			 }
+			 
+			 hsl[0] = h;
+			 hsl[1] = s;
+			 hsl[2] = l;
+		return hsl;
 	}
 	
 	
