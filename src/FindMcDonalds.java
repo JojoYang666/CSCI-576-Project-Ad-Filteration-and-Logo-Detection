@@ -1,14 +1,14 @@
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-public class FineBandQuoHist {
+public class FindMcDonalds {
 	private static int BYTES_PER_FRAME = 388800;
-	private static int FRAME_NO;
+	// private static int FRAME_NO;
 	private static int GRID_SIZE = 90;
 	private static int BANDS = 16;
 	private static int TOTAL_PIXELS_LOGO;
 	private static int TOTAL_COLORS_LOGO;
-	private static float LOGO_ENTROPY;
+	// private static float LOGO_ENTROPY;
 	private static int WIDTH = 480, HEIGHT = 270;
 	private static String videoFile, logoFile;
 	private static RandomAccessFile videoRand;
@@ -34,41 +34,53 @@ public class FineBandQuoHist {
 	private static float logoConfidence = -Float.MAX_VALUE;
 	private static float paramountConfidence;
 
-	public static void main(String[] args) {
-
-		videoFile = args[0];
-		logoFile = args[1];
-		FRAME_NO = Integer.parseInt(args[2]);
-
-		openVideo(videoFile);
-		openLogo(logoFile);
-		readFile(FRAME_NO, videoRand, vidH, vidS, vidV);
+	public static void preprocess(String vidFileName, String logoFileName) {
+		videoFile = vidFileName;
+		logoFile = logoFileName;
 		readFile(0, logoRand, logoH, logoS, logoV);
-		filterFrame(vidH, vidFilteredH);
-
 		makeHistogramForLogo(logoH, logoS, logoV, logoHHist, logoWBHist);
 		keepTopValsOfHistogram(logoHHist, logoWBHist);
-		System.out.println("HISTOGRAM OF LOGO AFTER:");
-		for (int i = 0; i < BANDS; i++) {
-			System.out.print("(" + i + ": " + logoHHist[i] + ")\t");
-		}
-		System.out.println("WHITE PIXELS - " + logoWBHist[0]);
-		System.out.println("BLACK PIXELS - " + logoWBHist[1] + "\n\n");
-
 		TOTAL_PIXELS_LOGO = calcTotalPixels(logoHHist, logoWBHist);
 		TOTAL_COLORS_LOGO = calcTotalColors(logoHHist, logoWBHist);
-		LOGO_ENTROPY = calcEntropy(logoHHist, logoWBHist, TOTAL_PIXELS_LOGO);
 		proportionalizeHistogram(logoHHist, logoWBHist, logoProportionsHHist, logoProportionsWBHist, TOTAL_PIXELS_LOGO);
-		System.out.println("LOGO ENTROPY - " + LOGO_ENTROPY);
-		System.out.println("TOTAL PIXELS: " + TOTAL_PIXELS_LOGO);
-		System.out.println("TOTAL COLORS: " + TOTAL_COLORS_LOGO);
+	}
 
-		System.out.println("HISTOGRAM OF LOGO AFTER:");
-		for (int i = 0; i < BANDS; i++) {
-			System.out.print("(" + i + ": " + logoProportionsHHist[i] + ")\t");
-		}
-		System.out.println("WHITE PIXELS - " + logoProportionsWBHist[0]);
-		System.out.println("BLACK PIXELS - " + logoProportionsWBHist[1]);
+	public static void findLogo(int frameNo) {
+
+		// videoFile = args[0];
+		// logoFile = args[1];
+
+		openVideo(videoFile);
+		// openLogo(logoFile);
+		readFile(frameNo, videoRand, vidH, vidS, vidV);
+		// readFile(0, logoRand, logoH, logoS, logoV);
+		filterFrame(vidH, vidFilteredH);
+
+		// makeHistogramForLogo(logoH, logoS, logoV, logoHHist, logoWBHist);
+		// keepTopValsOfHistogram(logoHHist, logoWBHist);
+		// //System.out.println("HISTOGRAM OF LOGO AFTER:");
+		// for (int i = 0; i < BANDS; i++) {
+		// //System.out.print("(" + i + ": " + logoHHist[i] + ")\t");
+		// }
+		// //System.out.println("WHITE PIXELS - " + logoWBHist[0]);
+		// //System.out.println("BLACK PIXELS - " + logoWBHist[1] + "\n\n");
+
+		// TOTAL_PIXELS_LOGO = calcTotalPixels(logoHHist, logoWBHist);
+		// TOTAL_COLORS_LOGO = calcTotalColors(logoHHist, logoWBHist);
+		// LOGO_ENTROPY = calcEntropy(logoHHist, logoWBHist, TOTAL_PIXELS_LOGO);
+		// proportionalizeHistogram(logoHHist, logoWBHist, logoProportionsHHist,
+		// logoProportionsWBHist, TOTAL_PIXELS_LOGO);
+		// //System.out.println("LOGO ENTROPY - " + LOGO_ENTROPY);
+		// //System.out.println("TOTAL PIXELS: " + TOTAL_PIXELS_LOGO);
+		// //System.out.println("TOTAL COLORS: " + TOTAL_COLORS_LOGO);
+
+		// //System.out.println("HISTOGRAM OF LOGO AFTER:");
+		// for (int i = 0; i < BANDS; i++) {
+		// System.out.print("(" + i + ": " + logoProportionsHHist[i] +
+		// ")\t");
+		// }
+		// //System.out.println("WHITE PIXELS - " + logoProportionsWBHist[0]);
+		// //System.out.println("BLACK PIXELS - " + logoProportionsWBHist[1]);
 
 		float temp;
 		for (int y = 0; y < HEIGHT; y += 10) {
@@ -297,7 +309,7 @@ public class FineBandQuoHist {
 	}
 
 	public static void makeHistogramForLogo(int[][] H, int[][] S, int[][] V, int[] hHist, int[] wbHist) {
-		boolean beg = false, end = false;
+		boolean beg = false, end = false, yellow = false;
 		int begPosX = 0, endPosX = 0;
 		int mostCommonH, mostCommonS, mostCommonV;
 
@@ -326,8 +338,9 @@ public class FineBandQuoHist {
 				}
 
 				if (beg == true && end == true) {
+					yellow = false;
 					for (int i = begPosX; i <= endPosX; i++) {
-						if (V[i][y] >= 87.5 && V[i][y] <= 100)
+						if (V[i][y] >= 87.5 && V[i][y] <= 100 && yellow!=true)
 							wbHist[0]++;
 						else if (V[i][y] >= 0 && V[i][y] <= 12.5)
 							wbHist[1]++;
@@ -344,9 +357,13 @@ public class FineBandQuoHist {
 							} else if (H[i][y] >= 40 && H[i][y] <= 51) {
 								// Orange-yellow
 								hHist[3]++;
+								if (yellow == false)
+									yellow = true;
 							} else if (H[i][y] >= 52 && H[i][y] <= 59) {
 								// Yellow
 								hHist[4]++;
+								if (yellow == false)
+									yellow = true;
 							} else if (H[i][y] >= 60 && H[i][y] <= 79) {
 								// Yellow-green
 								hHist[5]++;
