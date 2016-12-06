@@ -16,6 +16,7 @@ public class MyProgram {
 	private static ArrayList<Double> valsV = new ArrayList<Double>();
 	private static String inputVideoFile, inputAudioFile, outputVideoFile, outputAudioFile;
 	private static int sizeOfSlidingWindow = 5;
+    private static boolean searchLogoFlag;
 	private static double[][] currentYMatrix = new double[width][height];
 	private static double[][] prevYMatrix = new double[width][height];
 	private static double[][] currentUMatrix = new double[width][height];
@@ -255,14 +256,22 @@ public class MyProgram {
 	}
 
 	private static void parseArgs(String[] args) {
-		if (args.length != 2) {
-			Utilities.die("Not enough arguments! \nUsage java MyProgram input.rgb input.wav output.rgb output.wav");
+		if (args.length < 4) {
+			Utilities.die("Not enough arguments! \nUsage java MyProgram input.rgb input.wav output.rgb output.wav [-l]");
+		}
+		if (args.length > 5) {
+            Utilities.die("Too many arguments! \nUsage java MyProgram input.rgb input.wav output.rgb output.wav [-l]");
 		}
 
 		inputVideoFile = args[0];
 		inputAudioFile = args[1];
-		// outputVideoFile = args[2];
-		// outputAudioFile = args[3];
+		outputVideoFile = args[2];
+		outputAudioFile = args[3];
+        searchLogoFlag = false;
+      
+        if (args.length == 5) {
+            searchLogoFlag = true;
+        }
 	}
 
 }
