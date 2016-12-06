@@ -11,9 +11,9 @@ public class MyPlayer {
 
     static JFrame frame;
 
-    public static void StartThread() {
-        String videoFilename = "../../dataset/Videos/data_test1.rgb";
-        String audioFilename = "../../dataset/Videos/data_test1.wav";
+    public static void StartThread(String videoName, String audioName) {
+        String videoFilename = videoName;
+        String audioFilename = audioName;
 
         // opens the inputStream
         FileInputStream inputStream;
@@ -74,6 +74,6 @@ public class MyPlayer {
 
         frame.setVisible(true);
 
-        StartThread();
+        StartThread(args[0], args[1]);
     }
 }
