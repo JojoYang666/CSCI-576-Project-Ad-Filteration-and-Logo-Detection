@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Shot{
     private boolean isAd;
 	private double yMean;
@@ -8,10 +10,12 @@ public class Shot{
     private long startingFrame;
 	private long endingFrame;
     private long numberOfFrames;
+    private ArrayList<VideoFrame> framesWithLogo;
 	
 	public Shot() {
 		this.audioVoteCount = 0;
 		this.isAd = false;
+        this.framesWithLogo = new ArrayList<VideoFrame>();
 	}
 	
 	public Shot(boolean isAd, double yMean, double rmsMean, long startingByte, long lengthOfShot, int audioVoteCount,
@@ -26,6 +30,7 @@ public class Shot{
 		this.startingFrame = startingFrame;
 		this.endingFrame = endingFrame;
         this.numberOfFrames = endingFrame - startingFrame;
+        this.framesWithLogo = new ArrayList<VideoFrame>();
 	}
 
 	public boolean isAd() {
@@ -102,5 +107,13 @@ public class Shot{
   
     public void setNumberOfFrames(long num) {
         this.numberOfFrames = num;
+    }
+  
+    public ArrayList<VideoFrame> getFramesWithLogo() {
+        return(this.framesWithLogo);
+    }
+  
+    public void addFramesWithLogo(VideoFrame frame) {
+        this.framesWithLogo.add(frame);
     }
 }
