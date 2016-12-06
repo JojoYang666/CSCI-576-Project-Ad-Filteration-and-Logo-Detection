@@ -344,53 +344,55 @@ public class FindStarbucks {
 						else if (V[i][y] >= 0 && V[i][y] <= 12.5)
 							wbHist[1]++;
 						else {
-							if (H[i][y] >= 357 || H[i][y] <= 8) {
-								// Red
-								hHist[0]++;
-							} else if (H[i][y] >= 9 && H[i][y] <= 23) {
-								// Red-orange
-								hHist[1]++;
-							} else if (H[i][y] >= 24 && H[i][y] <= 39) {
-								// Orange-brown
-								hHist[2]++;
-							} else if (H[i][y] >= 40 && H[i][y] <= 51) {
-								// Orange-yellow
-								hHist[3]++;
-							} else if (H[i][y] >= 52 && H[i][y] <= 59) {
-								// Yellow
-								hHist[4]++;
-							} else if (H[i][y] >= 60 && H[i][y] <= 79) {
-								// Yellow-green
-								hHist[5]++;
-							} else if (H[i][y] >= 80 && H[i][y] <= 134) {
-								// Green
-								hHist[6]++;
-							} else if (H[i][y] >= 135 && H[i][y] <= 179) {
-								// Green-cyan
-								hHist[7]++;
-							} else if (H[i][y] >= 180 && H[i][y] <= 202) {
-								// Cyan
-								hHist[8]++;
-							} else if (H[i][y] >= 203 && H[i][y] <= 219) {
-								// Cyan-blue
-								hHist[9]++;
-							} else if (H[i][y] >= 220 && H[i][y] <= 254) {
-								// Blue
-								hHist[10]++;
-							} else if (H[i][y] >= 255 && H[i][y] <= 278) {
-								// Blue-magenta
-								hHist[11]++;
-							} else if (H[i][y] >= 279 && H[i][y] <= 317) {
-								// Magenta
-								hHist[12]++;
-							} else if (H[i][y] >= 318 && H[i][y] <= 336) {
-								// Magenta-pink
-								hHist[13]++;
-							} else if (H[i][y] >= 337 && H[i][y] <= 347) {
-								// Pink
-								hHist[14]++;
-							} else if (H[i][y] >= 348 && H[i][y] <= 356) {
-								hHist[15]++;
+							if (V[i][y] > 12.5 && V[i][y] < 87.5 && S[i][y] >= 70) {
+								if (H[i][y] >= 357 || H[i][y] <= 8) {
+									// Red
+									hHist[0]++;
+								} else if (H[i][y] >= 9 && H[i][y] <= 23) {
+									// Red-orange
+									hHist[1]++;
+								} else if (H[i][y] >= 24 && H[i][y] <= 39) {
+									// Orange-brown
+									hHist[2]++;
+								} else if (H[i][y] >= 40 && H[i][y] <= 51) {
+									// Orange-yellow
+									hHist[3]++;
+								} else if (H[i][y] >= 52 && H[i][y] <= 59) {
+									// Yellow
+									hHist[4]++;
+								} else if (H[i][y] >= 60 && H[i][y] <= 79) {
+									// Yellow-green
+									hHist[5]++;
+								} else if (H[i][y] >= 80 && H[i][y] <= 134) {
+									// Green
+									hHist[6]++;
+								} else if (H[i][y] >= 135 && H[i][y] <= 179) {
+									// Green-cyan
+									hHist[7]++;
+								} else if (H[i][y] >= 180 && H[i][y] <= 202) {
+									// Cyan
+									hHist[8]++;
+								} else if (H[i][y] >= 203 && H[i][y] <= 219) {
+									// Cyan-blue
+									hHist[9]++;
+								} else if (H[i][y] >= 220 && H[i][y] <= 254) {
+									// Blue
+									hHist[10]++;
+								} else if (H[i][y] >= 255 && H[i][y] <= 278) {
+									// Blue-magenta
+									hHist[11]++;
+								} else if (H[i][y] >= 279 && H[i][y] <= 317) {
+									// Magenta
+									hHist[12]++;
+								} else if (H[i][y] >= 318 && H[i][y] <= 336) {
+									// Magenta-pink
+									hHist[13]++;
+								} else if (H[i][y] >= 337 && H[i][y] <= 347) {
+									// Pink
+									hHist[14]++;
+								} else if (H[i][y] >= 348 && H[i][y] <= 356) {
+									hHist[15]++;
+								}
 							}
 						}
 					}
@@ -421,53 +423,55 @@ public class FindStarbucks {
 				else if (V[x][y] >= 0 && V[x][y] <= 12.5)
 					wbHist[1]++;
 				else {
-					if (H[x][y] >= 357 || H[x][y] <= 8) {
-						// Red
-						hHist[0]++;
-					} else if (H[x][y] >= 9 && H[x][y] <= 23) {
-						// Red-orange
-						hHist[1]++;
-					} else if (H[x][y] >= 24 && H[x][y] <= 39) {
-						// Orange-brown
-						hHist[2]++;
-					} else if (H[x][y] >= 40 && H[x][y] <= 51) {
-						// Orange-yellow
-						hHist[3]++;
-					} else if (H[x][y] >= 52 && H[x][y] <= 59) {
-						// Yellow
-						hHist[4]++;
-					} else if (H[x][y] >= 60 && H[x][y] <= 79) {
-						// Yellow-green
-						hHist[5]++;
-					} else if (H[x][y] >= 80 && H[x][y] <= 134) {
-						// Green
-						hHist[6]++;
-					} else if (H[x][y] >= 135 && H[x][y] <= 179) {
-						// Green-cyan
-						hHist[7]++;
-					} else if (H[x][y] >= 180 && H[x][y] <= 202) {
-						// Cyan
-						hHist[8]++;
-					} else if (H[x][y] >= 203 && H[x][y] <= 219) {
-						// Cyan-blue
-						hHist[9]++;
-					} else if (H[x][y] >= 220 && H[x][y] <= 254) {
-						// Blue
-						hHist[10]++;
-					} else if (H[x][y] >= 255 && H[x][y] <= 278) {
-						// Blue-magenta
-						hHist[11]++;
-					} else if (H[x][y] >= 279 && H[x][y] <= 317) {
-						// Magenta
-						hHist[12]++;
-					} else if (H[x][y] >= 318 && H[x][y] <= 336) {
-						// Magenta-pink
-						hHist[13]++;
-					} else if (H[x][y] >= 337 && H[x][y] <= 347) {
-						// Pink
-						hHist[14]++;
-					} else if (H[x][y] >= 348 && H[x][y] <= 356) {
-						hHist[15]++;
+					if (V[x][y] > 12.5 && V[x][y] < 87.5 && S[x][y] >= 20) {
+						if (H[x][y] >= 357 || H[x][y] <= 8) {
+							// Red
+							hHist[0]++;
+						} else if (H[x][y] >= 9 && H[x][y] <= 23) {
+							// Red-orange
+							hHist[1]++;
+						} else if (H[x][y] >= 24 && H[x][y] <= 39) {
+							// Orange-brown
+							hHist[2]++;
+						} else if (H[x][y] >= 40 && H[x][y] <= 51) {
+							// Orange-yellow
+							hHist[3]++;
+						} else if (H[x][y] >= 52 && H[x][y] <= 59) {
+							// Yellow
+							hHist[4]++;
+						} else if (H[x][y] >= 60 && H[x][y] <= 79) {
+							// Yellow-green
+							hHist[5]++;
+						} else if (H[x][y] >= 80 && H[x][y] <= 134) {
+							// Green
+							hHist[6]++;
+						} else if (H[x][y] >= 135 && H[x][y] <= 179) {
+							// Green-cyan
+							hHist[7]++;
+						} else if (H[x][y] >= 180 && H[x][y] <= 202) {
+							// Cyan
+							hHist[8]++;
+						} else if (H[x][y] >= 203 && H[x][y] <= 219) {
+							// Cyan-blue
+							hHist[9]++;
+						} else if (H[x][y] >= 220 && H[x][y] <= 254) {
+							// Blue
+							hHist[10]++;
+						} else if (H[x][y] >= 255 && H[x][y] <= 278) {
+							// Blue-magenta
+							hHist[11]++;
+						} else if (H[x][y] >= 279 && H[x][y] <= 317) {
+							// Magenta
+							hHist[12]++;
+						} else if (H[x][y] >= 318 && H[x][y] <= 336) {
+							// Magenta-pink
+							hHist[13]++;
+						} else if (H[x][y] >= 337 && H[x][y] <= 347) {
+							// Pink
+							hHist[14]++;
+						} else if (H[x][y] >= 348 && H[x][y] <= 356) {
+							hHist[15]++;
+						}
 					}
 				}
 			}
