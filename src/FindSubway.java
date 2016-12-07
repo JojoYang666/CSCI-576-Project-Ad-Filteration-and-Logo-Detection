@@ -83,8 +83,8 @@ public class FindSubway {
 		// //System.out.println("BLACK PIXELS - " + logoProportionsWBHist[1]);
 
 		float temp;
-		for (int y = 0; y < HEIGHT; y += 10) {
-			for (int x = 0; x < WIDTH; x += 10) {
+		for (int y = 45; y < (HEIGHT - 45 - GRID_SIZE); y += 10) {
+			for (int x = 45; x < (WIDTH - 45 - GRID_SIZE); x += 10) {
 				// System.out.println("\n\n##############################################");
 				// System.out.println(x + " " + y);
 
