@@ -256,8 +256,6 @@ public class MyProgram {
             }
             videoWriter.close();
 // rewrite header data size here
-System.out.println(audioInputStream.available());
-System.out.println(counter);
 			audioWriter.close();
         } catch (IOException e) {
             System.err.println("IOException: " + e.getMessage());
