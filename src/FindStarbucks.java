@@ -44,6 +44,12 @@ public class FindStarbucks {
 		TOTAL_PIXELS_LOGO = calcTotalPixels(logoHHist, logoWBHist);
 		TOTAL_COLORS_LOGO = calcTotalColors(logoHHist, logoWBHist);
 		proportionalizeHistogram(logoHHist, logoWBHist, logoProportionsHHist, logoProportionsWBHist, TOTAL_PIXELS_LOGO);
+		try {
+			logoRand.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public static void findLogo(VideoFrame frameObj) {
@@ -58,6 +64,12 @@ public class FindStarbucks {
 		openVideo(videoFile);
 		// openLogo(logoFile);
 		readFile(frameObj.getFrameNumber(), videoRand, vidH, vidS, vidV);
+		try {
+			videoRand.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// readFile(0, logoRand, logoH, logoS, logoV);
 		filterFrame(vidH, vidFilteredH);
 
