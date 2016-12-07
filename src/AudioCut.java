@@ -12,7 +12,7 @@ public class AudioCut {
     final private static String INPUT_FILE_2 = "../../dataset2/Videos/data_test2.wav";
 	final private static int BYTES_PER_VIDEO_FRAME = 388800;
 	final private static int HEADER_SIZE = 44;
-	final private static int SAMPLES_PER_FRAME = 1600;
+	final public static int SAMPLES_PER_FRAME = 1600;
 
 	private static ArrayList<Shot> shots;
 	private static DataInputStream dis;
