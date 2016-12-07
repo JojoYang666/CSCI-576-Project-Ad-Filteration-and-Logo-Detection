@@ -37,6 +37,7 @@ public class FindStarbucks {
 	public static void preprocess(String vidFileName, String logoFileName) {
 		videoFile = vidFileName;
 		logoFile = logoFileName;
+		openLogo(logoFile);
 		readFile(0, logoRand, logoH, logoS, logoV);
 		makeHistogramForLogo(logoH, logoS, logoV, logoHHist, logoWBHist);
 		keepTopValsOfHistogram(logoHHist, logoWBHist);
