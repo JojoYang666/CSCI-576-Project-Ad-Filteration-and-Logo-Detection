@@ -46,10 +46,10 @@ public class MyProgram {
 		FindNfl.preprocess(inputVideoFile, NFL_LOGO);
 		FrameReader fReader = new FrameReader(inputVideoFile, width, height);
 		makeShots(fReader);
-		if (searchLogoFlag) {
+        AudioCut.voteShots(shots, inputAudioFile);
+        if (searchLogoFlag) {
 			searchFramesForLogo();
 		}
-        AudioCut.voteShots(shots, inputAudioFile);
 		//System.out.println("SIZE OF FILE - " + fReader.getFileLength());
 		//System.out.println("SIZE OF SHOTS - " + shots.size());
 /*
@@ -242,66 +242,113 @@ public class MyProgram {
             byte[] audioBytes = new byte[44];
 			audioInputStream.read(audioBytes);
 			audioWriter.write(audioBytes);
+            boolean previousIsAd = false;
             int logo = -1;
+			int[] logoCount = new int[]{0, 0, 0, 0};
 long counter = 0;  // could be used to rewrite wav header
             for (Shot s: shots) {
                 if (s.isAd()) {
 					videoInputStream.skip(s.getLengthOfShot());
 					audioInputStream.skip(s.getNumberOfFrames() * AudioCut.SAMPLES_PER_FRAME * 2);
+                    previousIsAd = true;
+                    
+                    int max = logoCount[0];
+                    logo = 0;
+                    for (int i = 1; i < logoCount.length; i++) {
+                        if (logoCount[i] > max) {
+                            max = logoCount[i];
+                            logo = i;
+                        }
+                    }
+System.out.println("logo: " + logo + " with max value of " + max);
 counter += (s.getNumberOfFrames() * AudioCut.SAMPLES_PER_FRAME * 2);
                   
-                    if (searchLogoFlag) {
-                        InputStream logoVideoInputStream = null;
-                        InputStream logoAudioInputStream = null;
-                        if (logo == 0) {
-                            File logoVideoFile = new File(STARBUCKS_RGB);
-                            logoVideoInputStream = new FileInputStream(logoVideoFile);
-                            File logoAudioFile = new File(STARBUCKS_WAV);
-                            logoAudioInputStream = new FileInputStream(logoAudioFile);
-                        }
-                        else if (logo == 1) {
-                            File logoVideoFile = new File(SUBWAY_RGB);
-                            logoVideoInputStream = new FileInputStream(logoVideoFile);
-                            File logoAudioFile = new File(SUBWAY_WAV);
-                            logoAudioInputStream = new FileInputStream(logoAudioFile);
-                        }
-                        else if (logo == 2) {
-                            File logoVideoFile = new File(MCD_RGB);
-                            logoVideoInputStream = new FileInputStream(logoVideoFile);
-                            File logoAudioFile = new File(MCD_WAV);
-                            logoAudioInputStream = new FileInputStream(logoAudioFile);
-                        }
-                        else if (logo == 3) {
-                            File logoVideoFile = new File(NFL_RGB);
-                            logoVideoInputStream = new FileInputStream(logoVideoFile);
-                            File logoAudioFile = new File(NFL_WAV);
-                            logoAudioInputStream = new FileInputStream(logoAudioFile);
-                        }
-                        if (logoVideoInputStream != null) {
-                            while (logoVideoInputStream.available() != 0) {
-                                bytes = new byte[logoVideoInputStream.available()];
-                                logoVideoInputStream.read(bytes);
-                                videoWriter.write(bytes);
-                            }
-                        }
-                        if (logoAudioInputStream != null) {
-                            logoAudioInputStream.skip(44);
-                            while (logoAudioInputStream.available() != 0) {
-                                audioBytes = new byte[logoAudioInputStream.available()];
-                                logoAudioInputStream.read(audioBytes);
-                                audioWriter.write(audioBytes);
-                            }
-                        }
-                    }   
+                       
 				}
 				else {
                     if (searchLogoFlag) {
+						
+						if (previousIsAd) {
+                            InputStream logoVideoInputStream = null;
+                            InputStream logoAudioInputStream = null;
+                            if (logo == 0) {
+                                File logoVideoFile = new File(STARBUCKS_RGB);
+                                logoVideoInputStream = new FileInputStream(logoVideoFile);
+                                File logoAudioFile = new File(STARBUCKS_WAV);
+                                logoAudioInputStream = new FileInputStream(logoAudioFile);
+                            }
+                            else if (logo == 1) {
+                                File logoVideoFile = new File(SUBWAY_RGB);
+                                logoVideoInputStream = new FileInputStream(logoVideoFile);
+                                File logoAudioFile = new File(SUBWAY_WAV);
+                                logoAudioInputStream = new FileInputStream(logoAudioFile);
+                            }
+                            else if (logo == 2) {
+                                File logoVideoFile = new File(MCD_RGB);
+                                logoVideoInputStream = new FileInputStream(logoVideoFile);
+                                File logoAudioFile = new File(MCD_WAV);
+                                logoAudioInputStream = new FileInputStream(logoAudioFile);
+                            }
+                            else if (logo == 3) {
+                                File logoVideoFile = new File(NFL_RGB);
+                                logoVideoInputStream = new FileInputStream(logoVideoFile);
+                                File logoAudioFile = new File(NFL_WAV);
+                                logoAudioInputStream = new FileInputStream(logoAudioFile);
+                            }
+                            if (logoVideoInputStream != null) {
+                                while (logoVideoInputStream.available() != 0) {
+                                    bytes = new byte[logoVideoInputStream.available()];
+                                    logoVideoInputStream.read(bytes);
+                                    videoWriter.write(bytes);
+                                }
+                            }
+                            if (logoAudioInputStream != null) {
+                                logoAudioInputStream.skip(44);
+                                while (logoAudioInputStream.available() != 0) {
+                                    audioBytes = new byte[logoAudioInputStream.available()];
+                                    logoAudioInputStream.read(audioBytes);
+                                    audioWriter.write(audioBytes);
+                                }
+                            }
+                            previousIsAd = false;
+                            logoCount = new int[] {0, 0, 0, 0};
+                        }
+						
                         ArrayList<VideoFrame> frames = s.getFramesWithLogo();
                         long framesRemaining = s.getNumberOfFrames();
-                        long currentFrameIndex = s.getStartingFrame();
-                      
+                        int currentFrameIndex = (int)s.getStartingFrame();
+                        int vfIndex = 0;
+                        VideoFrame vf = null;
                         if (frames.size() > 0) {
-                            VideoFrame vf = frames.get(0);
+                            vf = frames.get(vfIndex);
+                        }
+                      
+                        while (framesRemaining != 0) {
+                            byte[] aFrame = new byte[3 * width * height];
+                            videoInputStream.read(aFrame);
+                            if (vf != null) {
+                                if (vf.getFrameNumber() == currentFrameIndex) {
+System.out.print("boxing " + vf.getFrameNumber() + ": " + vf.getLogo() + " ");
+                                    boxLogo(aFrame, vf.getLogo(), vf.getLogoLocation());
+                                  
+                                    logoCount[vf.getLogo()]++;
+                                  
+                                    vfIndex++;
+                                    if (frames.size() >= vfIndex) {
+                                        vf = frames.get(vfIndex);
+                                    }
+                                    else {
+                                        vf = null;
+                                    }
+                                }
+                            }
+                            videoWriter.write(aFrame);
+                            currentFrameIndex++;
+                            framesRemaining -= aFrame.length;
+                        }
+/*
+                        if (frames.size() > 0) {
+                            
                             long index = vf.getFrameNumber();
 
                             long diff = index - currentFrameIndex;
@@ -361,6 +408,7 @@ System.out.print(index + ": ");
                                 bytesRemaining -= bytes.length;
                             }
                         }
+*/
                     }
                     else {
                         long bytesRemaining = s.getLengthOfShot();
@@ -494,26 +542,27 @@ System.out.println(location);
         for (Shot s: shots) {
             if (!s.isAd()) {
                 ArrayList<VideoFrame> frames = s.getFramesWithLogo();
-                for (long l = s.getStartingFrame(); l < s.getEndingFrame(); l++) {
+                for (long l = s.getStartingFrame(); l < s.getEndingFrame(); l += 2) {
                     VideoFrame vf = new VideoFrame();
                     vf.setFrameNumber((int)l);
-                    //FindStarbucks.findLogo(vf);
-//System.out.print(l + ": Finding Starbucks ");
+                    FindStarbucks.findLogo(vf);
+System.out.print(l + ": Finding Starbucks ");
                     FindSubway.findLogo(vf);
-System.out.print(l + ": Finding Subway ");
-/*System.out.print("Subway ");
+System.out.print("Subway ");
                     FindMcDonalds.findLogo(vf);
 System.out.print("McDonalds ");
                     FindNfl.findLogo(vf);
 System.out.print("NFL ");
-*/
                     if (vf.getLogo() != -1) {
                         frames.add(vf);
-System.out.print("added ");
+System.out.print("added " + vf.getLogo() + " ");
                     }
 System.out.println("done");
                 }
 			}
+            else {
+                System.out.println("Ads from " + s.getStartingFrame() + " to " + s.getEndingFrame());
+            }
 		}
 	}
 
