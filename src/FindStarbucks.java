@@ -51,6 +51,10 @@ public class FindStarbucks {
 		// videoFile = args[0];
 		// logoFile = args[1];
 
+		logoConfidence = 0;
+		paramountConfidence = 0;
+		tx = -1;
+		ty = -1;
 		openVideo(videoFile);
 		// openLogo(logoFile);
 		readFile(frameObj.getFrameNumber(), videoRand, vidH, vidS, vidV);
@@ -103,11 +107,12 @@ public class FindStarbucks {
 			}
 		}
 
-		if(logoConfidence>0.85){
-			if(frameObj.getConfidence()<logoConfidence){
+		if (logoConfidence > 0.85) {
+//			System.out.println(tx + "\t" + ty);
+			if (frameObj.getConfidence() < logoConfidence) {
 				frameObj.setConfidence(logoConfidence);
 				frameObj.setLogo(0);
-				frameObj.setLogoLocation(ty*WIDTH + tx);
+				frameObj.setLogoLocation(ty * WIDTH + tx);
 			}
 		}
 	}
@@ -639,4 +644,32 @@ public class FindStarbucks {
 
 		return 0;
 	}
+
+//	public static void main(String[] args) {
+//		preprocess(args[0], args[1]);
+//		System.out.println("HISTOGRAM OF LOGO AFTER:");
+//		for (int i = 0; i < BANDS; i++) {
+//			System.out.print("(" + i + ": " + logoHHist[i] + ")\t");
+//		}
+//		System.out.println("WHITE PIXELS - " + logoWBHist[0]);
+//		System.out.println("BLACK PIXELS - " + logoWBHist[1] + "\n\n");
+//
+//		VideoFrame temp = new VideoFrame();
+//		temp.setFrameNumber(5175);
+//
+//		for (int i = 0; i < 300; i++) {
+//			findLogo(temp);
+//			if (temp.getLogo() != -1) {
+//				System.out.println("FOUND SOMETHING at " + temp.getFrameNumber() + " - " + temp.getLogoLocation() + "\t"
+//						+ temp.getConfidence());
+//			} else {
+//				System.out.println("NOTHING AT " + temp.getFrameNumber());
+//			}
+//			temp.setFrameNumber(temp.getFrameNumber() + 1);
+//			temp.setConfidence(-1);
+//			temp.setLogo(-1);
+//			temp.setLogoLocation(-1);
+//		}
+//
+//	}
 }

@@ -51,6 +51,10 @@ public class FindMcDonalds {
 		// videoFile = args[0];
 		// logoFile = args[1];
 
+		logoConfidence = 0;
+		paramountConfidence = 0;
+		tx = -1;
+		ty = -1;
 		openVideo(videoFile);
 		// openLogo(logoFile);
 		readFile(frameObj.getFrameNumber(), videoRand, vidH, vidS, vidV);
