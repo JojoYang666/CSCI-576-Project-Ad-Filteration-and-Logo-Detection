@@ -30,13 +30,15 @@ public class MyProgram {
 		FrameReader fReader = new FrameReader(inputVideoFile, width, height);
 		makeShots(fReader);
         AudioCut.voteShots(shots, inputAudioFile);
-		System.out.println("SIZE OF FILE - " + fReader.getFileLength());
-		System.out.println("SIZE OF SHOTS - " + shots.size());
+		//System.out.println("SIZE OF FILE - " + fReader.getFileLength());
+		//System.out.println("SIZE OF SHOTS - " + shots.size());
+/*
 		for (Shot s : shots) {
 			System.out.println("SHOT: " + s.getStartingByte() + "   " + s.getLengthOfShot() + " | " + s.isAd() + " " + s.getAudioVoteCount() + " " + s.getStartingFrame() + " " + s.getEndingFrame());
 		}
+*/
 		//writeToDisk();
-		// makeScenes();
+        writeScenesToDisk();
 		fReader.close();
 	}
 
@@ -53,11 +55,11 @@ public class MyProgram {
 		boolean startProcess = true, firstFrameDiffEstimate = true;
 		shots = new ArrayList<Shot>();
 
-		System.out.println("MAX NUMBER OF FRAMES - " + maxNumOfFrames);
+		//System.out.println("MAX NUMBER OF FRAMES - " + maxNumOfFrames);
 
 		// TODO Audio processing
 		while (offset < maxNumOfFrames) {
-			System.out.println("CURRENT FRAME - " + offset );
+			//System.out.println("CURRENT FRAME - " + offset );
 			if (startProcess == false) {
 				currentYUV = fReader.read();
 				currentYMatrix = currentYUV.getY();
@@ -115,7 +117,7 @@ public class MyProgram {
 			}
 
 			if (startProcess == true) {
-				System.out.println("Starting with " + offset);
+				//System.out.println("Starting with " + offset);
 				shots.add(new Shot());
 				shots.get(shots.size() - 1).setStartingByte(offset * fReader.getLen());
 				shots.get(shots.size() - 1).setStartingFrame((offset * fReader.getLen())/BYTES_PER_VIDEO_FRAME);
@@ -193,10 +195,77 @@ public class MyProgram {
 			}
 		}
 	}
-
-	private static void makeScenes() {
-
-	}
+  
+    private static void writeScenesToDisk() {
+        final int MAX_LIMIT = 999999999;
+        InputStream audioInputStream = null;
+        InputStream videoInputStream = null;
+      
+        try {
+            File videoFile = new File(inputVideoFile);
+            videoInputStream = new FileInputStream(videoFile);
+        } catch (FileNotFoundException e) {
+            Utilities.die("File Not Found: " + inputVideoFile);
+        }
+        try {
+            File audioFile = new File(inputAudioFile);
+            audioInputStream = new FileInputStream(audioFile);
+        } catch (FileNotFoundException e) {
+            Utilities.die("File Not Found: " + inputAudioFile);
+        }
+      
+        try {
+            FileOutputStream videoWriter = new FileOutputStream(new File(outputVideoFile));
+            FileOutputStream audioWriter = new FileOutputStream(new File(outputAudioFile));
+			
+			byte[] audioBytes = new byte[44];
+			audioInputStream.read(audioBytes);
+			audioWriter.write(audioBytes);
+long counter = 0;
+            for (Shot s: shots) {
+                if (s.isAd()) {
+					videoInputStream.skip(s.getLengthOfShot());
+					audioInputStream.skip(s.getNumberOfFrames() * AudioCut.SAMPLES_PER_FRAME * 2);
+counter += (s.getNumberOfFrames() * AudioCut.SAMPLES_PER_FRAME * 2);
+				}
+				else {
+                    long bytesRemaining = s.getLengthOfShot();
+                    byte[] bytes;
+                    while (bytesRemaining != 0) {
+                        if (bytesRemaining >= MAX_LIMIT) {
+						    bytes = new byte[MAX_LIMIT];
+                        }
+                        else {
+                            bytes = new byte[(int)bytesRemaining];
+                        }
+                        videoInputStream.read(bytes);
+                        videoWriter.write(bytes);
+                        bytesRemaining -= bytes.length;
+                    }
+					long audioBytesRemaining = s.getNumberOfFrames() * AudioCut.SAMPLES_PER_FRAME * 2;
+					while (audioBytesRemaining != 0) {
+						if (audioBytesRemaining >= MAX_LIMIT) {
+							audioBytes = new byte[MAX_LIMIT];
+						}
+						else {
+							audioBytes = new byte[(int)audioBytesRemaining];
+						}
+						audioInputStream.read(audioBytes);
+						audioWriter.write(audioBytes);
+						audioBytesRemaining -= audioBytes.length;
+counter += audioBytes.length;
+					}
+                }
+            }
+            videoWriter.close();
+// rewrite header data size here
+System.out.println(audioInputStream.available());
+System.out.println(counter);
+			audioWriter.close();
+        } catch (IOException e) {
+            System.err.println("IOException: " + e.getMessage());
+        }
+    }
 
 	private static double getFrameAvg() {
 		double frameAvg = 0;
@@ -271,6 +340,13 @@ public class MyProgram {
       
         if (args.length == 5) {
             searchLogoFlag = true;
+        }
+      
+        if (!outputVideoFile.endsWith(".rgb")) {
+            outputVideoFile += ".rgb";
+        }
+        if (!outputAudioFile.endsWith(".wav")) {
+            outputAudioFile += ".wav";
         }
 	}
 
