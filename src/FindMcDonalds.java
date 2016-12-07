@@ -315,7 +315,7 @@ public class FindMcDonalds {
 					int G = (pix >> 8) & 0xff;
 					int R = (pix >> 16) & 0xff;
 
-					hslVals = colorConvert.ColorSpaceConverter.RGBtoHSL(R, G, Bl);
+					hslVals = ColorSpaceConverter.RGBtoHSL(R, G, Bl);
 					H[x][y] = Math.round((float) hslVals[0]);
 					S[x][y] = Math.round((float) hslVals[1] * 100);
 					V[x][y] = Math.round((float) hslVals[2] * 100);

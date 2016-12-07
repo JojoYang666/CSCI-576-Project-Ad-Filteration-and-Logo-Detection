@@ -6,7 +6,6 @@ import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
-import colorConvert.ColorSpaceConverter;
 
 public class QuotientHist {
 	private static int BYTES_PER_FRAME = 388800;

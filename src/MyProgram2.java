@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-public class MyProgram {
+public class MyProgram2 {
 	final public static String STARBUCKS_LOGO = "../../dataset/Brand Images/starbucks_logo.rgb";
 	final public static String STARBUCKS_RGB = "../../dataset/Ads/Starbucks_Ad_15s.rgb";
 	final public static String STARBUCKS_WAV = "../../dataset/Ads/Starbucks_Ad_15s.wav";
@@ -250,6 +250,7 @@ public class MyProgram {
 			boolean previousIsAd = false;
 			int logo = -1;
 			int[] logoCount = new int[] { 0, 0, 0, 0 };
+            float[] confidenceCount = new float[] { 0.0f, 0.0f, 0.0f, 0.0f };
 			long counter = 0; // could be used to rewrite wav header
 			for (Shot s : shots) {
 				if (s.isAd()) {
@@ -257,17 +258,18 @@ public class MyProgram {
 					audioInputStream.skip(s.getNumberOfFrames() * AudioCut.SAMPLES_PER_FRAME * 2);
 					previousIsAd = true;
 
-					int max = logoCount[0];
-					logo = 0;
-					for (int i = 1; i < logoCount.length; i++) {
-						if (logoCount[i] > max) {
-							max = logoCount[i];
-							logo = i;
+					float max = -1;
+					logo = -1;
+					for (int i = 0; i < logoCount.length; i++) {
+                        if (logoCount[i] > 0) {
+                            float average = confidenceCount[i] / logoCount[i];
+                            if (average > max) {
+                                max = average;
+                                logo = i;
+                            }
 						}
 					}
 					
-					if(max==0)
-						logo = -1;
 					//System.out.println("logo: " + logo + " with max value of " + max);
 					counter += (s.getNumberOfFrames() * AudioCut.SAMPLES_PER_FRAME * 2);
 
@@ -337,6 +339,7 @@ public class MyProgram {
 									boxLogo(aFrame, vf.getLogo(), vf.getLogoLocation());
 
 									logoCount[vf.getLogo()]++;
+                                    confidenceCount[vf.getLogo()] += vf.getConfidence();
 
 									vfIndex++;
 									if (frames.size() > vfIndex) {
@@ -584,5 +587,4 @@ public class MyProgram {
 		}
         System.out.println("Done logo searching");
 	}
-
 }
