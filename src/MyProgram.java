@@ -221,12 +221,10 @@ public class MyProgram {
 			byte[] audioBytes = new byte[44];
 			audioInputStream.read(audioBytes);
 			audioWriter.write(audioBytes);
-long counter = 0;
             for (Shot s: shots) {
                 if (s.isAd()) {
 					videoInputStream.skip(s.getLengthOfShot());
 					audioInputStream.skip(s.getNumberOfFrames() * AudioCut.SAMPLES_PER_FRAME * 2);
-counter += (s.getNumberOfFrames() * AudioCut.SAMPLES_PER_FRAME * 2);
 				}
 				else {
                     long bytesRemaining = s.getLengthOfShot();
@@ -253,7 +251,6 @@ counter += (s.getNumberOfFrames() * AudioCut.SAMPLES_PER_FRAME * 2);
 						audioInputStream.read(audioBytes);
 						audioWriter.write(audioBytes);
 						audioBytesRemaining -= audioBytes.length;
-counter += audioBytes.length;
 					}
                 }
             }

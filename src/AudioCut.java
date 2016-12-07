@@ -454,7 +454,7 @@ public class AudioCut {
         double totalFrames = shots.get(shots.size() - 1).getEndingFrame() + 1;
         double averageFrames = totalFrames / shots.size();
         for (Shot s: shots) {
-            s.setNumberOfFrames(s.getEndingFrame() - s.getStartingFrame());
+            s.setNumberOfFrames(s.getEndingFrame() - s.getStartingFrame() + 1);
             for (int i = (int)s.getStartingFrame(); i < (int)s.getEndingFrame() && i < rmses.length; i++) {
                 if ((rmses[i] > max) || (rmses[i] < min)) {
                     s.incrementAudioVoteCount();
