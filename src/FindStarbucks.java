@@ -106,7 +106,7 @@ public class FindStarbucks {
 			if(frameObj.getConfidence()<logoConfidence){
 				frameObj.setConfidence(logoConfidence);
 				frameObj.setLogo(0);
-//				frameObj.setLogoLocation();
+				frameObj.setLogoLocation(ty*WIDTH + tx);
 			}
 		}
 	}

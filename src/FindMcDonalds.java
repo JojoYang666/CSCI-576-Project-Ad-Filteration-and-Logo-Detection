@@ -45,14 +45,14 @@ public class FindMcDonalds {
 		proportionalizeHistogram(logoHHist, logoWBHist, logoProportionsHHist, logoProportionsWBHist, TOTAL_PIXELS_LOGO);
 	}
 
-	public static void findLogo(int frameNo) {
+	public static void findLogo(VideoFrame frameObj) {
 
 		// videoFile = args[0];
 		// logoFile = args[1];
 
 		openVideo(videoFile);
 		// openLogo(logoFile);
-		readFile(frameNo, videoRand, vidH, vidS, vidV);
+		readFile(frameObj.getFrameNumber(), videoRand, vidH, vidS, vidV);
 		// readFile(0, logoRand, logoH, logoS, logoV);
 		filterFrame(vidH, vidFilteredH);
 
@@ -102,11 +102,13 @@ public class FindMcDonalds {
 			}
 		}
 
-		// System.out.println("\n\n\nCORRECTED IMAGE");
-		if (logoConfidence == 0 || (tx == -1 && ty == -1))
-			System.out.println("NO LOGOS, BRUH!");
-		else
-			System.out.println("(" + tx + "\t" + ty + "): " + logoConfidence);
+		if(logoConfidence>0.85){
+			if(frameObj.getConfidence()<logoConfidence){
+				frameObj.setConfidence(logoConfidence);
+				frameObj.setLogo(2);
+				frameObj.setLogoLocation(ty*WIDTH + tx);
+			}
+		}
 	}
 
 	private static void keepTopValsOfHistogram(int[] hHist, int[] wbHist) {
