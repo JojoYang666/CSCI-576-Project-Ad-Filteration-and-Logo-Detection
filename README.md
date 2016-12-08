@@ -37,3 +37,7 @@ logo with the most number of hits, is used to replace the original advertisement
 subliminal advertising.
 
 *NOTE: Video and audio files are not included in this repository*
+
+Sample Screenshot (Subway)
+--------------------------
+![Image of Subway Logo Detection](SubwayLogoDetection.png)
