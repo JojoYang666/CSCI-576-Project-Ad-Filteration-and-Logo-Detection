@@ -41,3 +41,7 @@ subliminal advertising.
 Sample Screenshot (Subway)
 --------------------------
 ![Image of Subway Logo Detection](SubwayLogoDetection.png)
+
+Sample Screenshot (Starbucks)
+--------------------------
+![Image of Starbucks Logo Detection](StarbucksDetection.png)
