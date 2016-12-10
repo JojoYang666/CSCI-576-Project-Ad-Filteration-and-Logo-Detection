@@ -11,7 +11,7 @@ A video player was designed with 'Play', 'Pause' and 'Stop' buttons.
 
 Part 2: Advertisement filtration
 ---------------------------------
-Firstly, the video file is divided into shots which represent scene changes. Shots are created by comparing the interframe difference
+Firstly, the video file is divided into shots which represent scene changes. Shots are created by comparing the interframe difference (motion vector analysis)
 of the current frame and the previous frame with a threshold which is dynamically determined by using the average and deviation of 
 interframe differences of 5 previous frames in a sliding window. The main advantage of the sliding window is that it is sensitive to
 gradual and sudden pan motions of the camera. The shots are stored as an array and it is processed further to separate the
