@@ -1,4 +1,4 @@
-CSCI 576: Multimedia Design Systems Project - Advertisement Filteration and Logo Detection
+CSCI 576: Multimedia Design Systems Project - Advertisement Filtration and Logo Detection
 ==========================================================================================
 
 This project was completed in Fall 2016 as a requirement for CSCI 576 which is taught by Dr. Parag Havaldar at the University
@@ -9,7 +9,7 @@ Part 1: Video Player
 --------------------
 A video player was designed with 'Play', 'Pause' and 'Stop' buttons. 
 
-Part 2: Advertisement Filteration
+Part 2: Advertisement filtration
 ---------------------------------
 Firstly, the video file is divided into shots which represent scene changes. Shots are created by comparing the interframe difference
 of the current frame and the previous frame with a threshold which is dynamically determined by using the average and deviation of 
@@ -25,7 +25,7 @@ advertisements.
 
 Part 3: Logo Detection
 ----------------------
-After advertisement filteration, the remaining (desirable) shots undergo logo detection. Color statistics is the only statistical
+After advertisement filtration, the remaining (desirable) shots undergo logo detection. Color statistics is the only statistical
 metric which is used for detection. Every frame is divided into blocks of 90x90. For each block, its histogram is compared with
 the histogram of the logo. The absolute pixel density per color is not compared. Instead, the percentage contribution of the pixels
 of the logo and the frame block are compared using a bell curve to determine the closeness of the block histogram with the logo 
